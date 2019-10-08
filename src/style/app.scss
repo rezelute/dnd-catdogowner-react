@@ -1,0 +1,67 @@
+//APP LEVEL AND COMMON CSS
+@import "./variables";
+@import "./petList";
+
+/* LINKS */
+a{
+  color: $theme-link-color;
+}
+
+//HEADINGS
+//top heading on each left, pagearea and right
+main > section > h2{text-align: center;}
+
+/* MAIN */
+main{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+//LEFT SIDEBAR
+#sidebar-left{
+  //justify-content: space-between;
+  //text-align: center;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: $sidebar-width;
+  height: 100%;
+  border-right: 1px solid rgba(0,0,0,0.2);
+  background: white;
+  padding: 1em; //1em ($sidebar-padding / 2);
+}
+
+//PAGE AREA
+#pageArea{
+  position: relative;
+	//display: flex;
+	//align-items: center;
+  //flex-direction: column;
+	width: (100vw - ($sidebar-width * 2));
+	height: 100vh; //height: 100%;
+  overflow-y: auto;
+  padding: 1em; //$pagearea-padding;
+}
+
+//RIGHT SIDE BAR
+#sidebar-right{
+  background: white;
+  display: flex;
+  position: relative;
+  width: $sidebar-width;
+  height: 100%;
+  flex-direction: column;
+  align-items: center;
+  //justify-content: space-between;
+  overflow: hidden;
+  border-left: 1px solid rgba(0,0,0,0.2);
+  padding: 1em; //1em ($sidebar-padding / 2);
+}
+
+
+//

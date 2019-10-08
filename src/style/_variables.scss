@@ -1,0 +1,33 @@
+
+// $theme-color-primary: red;
+// $theme-color-secondary: blue;
+
+$theme-font: 'Helvetica Neue'; //, "Roboto", -apple-system, BlinkMacSystemFont, "Segoe UI", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+$theme-font-size: 0.8vw;
+$theme-panelcolor: #efefef;
+$theme-text-color: #222222;
+$theme-link-color: blue;
+
+//PAGE AREA
+//$pagearea-padding: 1.5vw;
+$pagearea-box-bg: #fff;
+$pagearea-box-border: #ccc;
+$pagearea-box-color-head: darken($pagearea-box-border, 50%);
+$pagearea-box-width: 33.333%;
+
+
+
+//SIDEBAR 
+$sidebar-width: 15vw;
+//$sidebar-padding: 1.5vw;
+
+//sidebar boxes
+$sidebar-box-padding: 0.5em;
+
+//cat boxes theme
+$sidebar-left-box-dark: rgb(231, 95, 95);
+$sidebar-left-box-light: lighten($sidebar-left-box-dark, 30%);
+
+//dog boxes theme
+$sidebar-right-box-dark: rgb(55, 116, 230);
+$sidebar-right-box-light: lighten($sidebar-right-box-dark, 30%);

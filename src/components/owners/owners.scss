@@ -1,0 +1,86 @@
+@import "../../style/variables";
+
+//OWNER LIST
+#owner-list{
+  display: flex;
+	flex-direction: row;
+	//align-items: center;
+	width: 100%;
+	justify-content: flex-start;
+	overflow-x: hidden;
+  overflow-y: auto;
+  flex-wrap: wrap;
+}
+//each owner item
+#owner-list > li{
+  padding: 0.5em;
+  width: $pagearea-box-width;
+  margin-bottom: 1em;
+  
+  >div{
+    position: relative;
+    border-radius: 1em;
+    background: $pagearea-box-bg;
+    border:1px solid $pagearea-box-border;
+    padding: 1em 1em 5em 1em;
+  }
+
+  //top property title (header)
+  .owner-name{
+    //background: $pagearea-box-color;
+    text-align: center;
+    margin-bottom: 0.3em;
+    margin-top:0;
+    padding: 0.5em;
+    color: $pagearea-box-color-head;
+    
+    //line under heading
+    &:after{
+      padding: 0.5em 0;
+      content: "";
+      display: block;
+      border-bottom: 0.2em solid $pagearea-box-border;
+      width: 100%;
+      margin: 0px auto;
+    }
+  }
+
+  .owner-attributes{
+    //every property (color, breed etc)
+    >*{
+      margin-bottom: 0.6em;
+
+      &:last-child{
+        margin-bottom: 0;
+      }
+    }
+    //label
+    span{
+      font-weight: bold;
+    }
+  }
+
+  .owner-pets{
+    margin-top: 1.5em;
+    //every property (color, breed etc)
+    >*{
+      margin-bottom: 0.6em;
+
+      &:last-child{
+        margin-bottom: 0;
+      }
+    }
+    //label
+    span{
+      font-weight: bold;
+    }
+  }
+
+  .owner-id{
+    position: absolute;
+    bottom: 0.6em;
+    right: 0.6em;
+    margin:0;
+    opacity: 0.3;
+  }
+}
