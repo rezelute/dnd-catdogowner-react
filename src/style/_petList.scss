@@ -3,6 +3,7 @@
 /* SIDEBAR COMMON */
 //PET LIST
 ul.pet-list{
+  padding-top:3em;
   //display: flex;
 	//flex-direction: column;
 	//align-items: center;
@@ -11,11 +12,56 @@ ul.pet-list{
 	overflow-x: hidden;
   overflow-y: auto;
 }
+
 //each pet item
 ul.pet-list > li{
-  cursor: grab;
-  margin-bottom: 1em;
+  margin-bottom: 2.5em;
   position: relative;
+
+  //functional buttons absolutely positioned
+  .pet-buttons{
+    position: absolute;
+    top: -2.2em;
+    right: 0;
+
+    button{
+      font-size: 100%;
+      height: 2em;
+      width: 2em;
+      border-radius: 3px;
+      border:1px solid rgb(95, 95, 95);
+      margin-right: 1em;
+      padding: 0.2em;
+      &:last-child{margin-right: 0;}
+
+      &.info{
+        background: #fff url("../assets/images/info.svg") no-repeat center;
+        background-size: 80%;
+      }
+      &.rename{
+        background: #fff url("../assets/images/edit.svg") no-repeat center;
+        background-size: 80%;
+      }
+      &.delete{
+        background: #fff url("../assets/images/delete.svg") no-repeat center;
+        background-size: 80%;
+      }
+    }
+  }
+
+  //show buttons on hover
+  &:hover{
+    .pet-buttons{
+      visibility:visible;
+      opacity:1;
+      transition:visibility 0.2s linear, opacity 0.2s linear;
+    }
+  }
+
+  //show drag hand on draggable area
+  .pet-draggable{
+    cursor: grab;
+  }
 
   //top property title (header)
   .pet-name{
@@ -26,6 +72,7 @@ ul.pet-list > li{
     color: white;
   }
 
+  //pet attributes
   .pet-attributes{
     padding: 0.5em;
 
@@ -43,6 +90,7 @@ ul.pet-list > li{
     }
   }
 
+  //absolute pet id
   .pet-id{
     position: absolute;
     bottom: 0;
@@ -50,6 +98,8 @@ ul.pet-list > li{
     margin:0;
   }
 }
+
+
 //left cat specific
 ul.pet-list.cats > li{
   border: 1px solid $sidebar-left-box-dark;

@@ -2,6 +2,13 @@
 @import "./variables";
 @import "./petList";
 
+/* COMMONS */
+.hide{display:none;}
+.invisible{
+  visibility: hidden;
+  opacity:0;
+}
+
 /* LINKS */
 a{
   color: $theme-link-color;
