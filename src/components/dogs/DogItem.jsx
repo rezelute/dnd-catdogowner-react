@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import PropTypes from "prop-types"
 
 
-export default class CatItem extends Component
+export default class DogItem extends Component
 {
   //onDragStart={this.onDragStart.bind(this, 100, 200)
   // onDragStart = (itemId, ItemId2, event) =>
@@ -16,7 +16,7 @@ export default class CatItem extends Component
     const { id, name, breed, color } = this.props;
 
     return (
-      <li id={"cat-item-" + id} draggable="true"
+      <li id={"dog-item-" + id} draggable="true"
         onDrag={this.props.onDrag} //onDragStart={this.onDragStart}
       >
         <h3 className="pet-name">{name}</h3>
@@ -32,12 +32,11 @@ export default class CatItem extends Component
 
 
 //PropTypes
-CatItem.propTypes = {
+DogItem.propTypes = {
   id: PropTypes.number.isRequired,
   name: PropTypes.string.isRequired,
   breed: PropTypes.string.isRequired,
   color: PropTypes.string.isRequired,
 
-  //onDragStart: PropTypes.func.isRequired,
   onDrag: PropTypes.func.isRequired
 }

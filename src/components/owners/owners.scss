@@ -17,12 +17,17 @@
   width: $pagearea-box-width;
   margin-bottom: 1em;
   
+  //actual box
   >div{
     position: relative;
     border-radius: 1em;
     background: $pagearea-box-bg;
     border:1px solid $pagearea-box-border;
     padding: 1em 1em 5em 1em;
+
+    &.dragOver{
+      border:1px solid green;
+    }
   }
 
   //top property title (header)

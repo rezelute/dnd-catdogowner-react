@@ -63,7 +63,14 @@ ul.pet-list.cats > li{
   }
 }
 //right dog specific
-ul.pet-list.dog > li{
+ul.pet-list.dogs > li{
   border: 1px solid $sidebar-right-box-dark;
   background: $sidebar-right-box-light;
+
+  .pet-name{
+    background: $sidebar-right-box-dark;
+  }
+  .pet-id{
+    color:$sidebar-right-box-dark;
+  }
 }

@@ -2,22 +2,60 @@ import React, { Component } from 'react'
 import PropTypes from "prop-types"
 
 
-export default class OwnerItem extends Component {
+export default class OwnerItem extends Component
+{
+  state = {
+    isDragOver:false
+  }
+
+  //item drag over entered this box > highlight box
+  onDragOver = (event) =>
+  {
+    event.preventDefault();
+    
+    this.setState({
+      isDragOver: true
+    });
+  }
+  //item drag over left this box > unhighlight box
+  onDragLeave = (event) =>
+  {
+    event.preventDefault();
+    
+    this.setState({
+      isDragOver: false
+    });
+  }
+
+  //ondrop of item in the box > prevent default (default is redirect) then pass up to parent
+  onDrop = (event) => {
+    event.preventDefault();
+
+    //remove highlight
+    this.setState({
+      isDragOver: false
+    });
+
+    this.props.onDrop();
+  }
+
   render()
   {
-    const { id, name, country, age, catCount, dogCount } = this.props;
+    const { id, name, country, age, catIds, dogIds } = this.props;
 
     return (
-      <li onDrop={this.props.onDrop} onDragOver={this.props.onDragOver} >
-        <div>
+      <li>
+        <div className={(this.state.isDragOver ? "dragOver" : "")}
+          onDrop={this.onDrop} onDragOver={this.onDragOver} onDragLeave={this.onDragLeave}
+        >
           <div className="owner-attributes">
             <h3 className="owner-name">{name}</h3>
             <div><span>Age:</span> {age}</div>
             <div><span>Country:</span> {country}</div>
           </div>
           <div className="owner-pets">
-            <div><span>Cat count:</span> {catCount}</div>
-            <div><span>Dog count:</span> {dogCount}</div>
+            <div><span>Cat count:</span> {catIds.length}</div>
+            <div><span>Dog count:</span> {dogIds.length}</div>
           </div>
           <span className="owner-id">{id}</span>
         </div>
@@ -32,9 +70,9 @@ OwnerItem.propTypes = {
   name: PropTypes.string.isRequired,
   age: PropTypes.number.isRequired,
   country: PropTypes.string.isRequired,
-  catCount: PropTypes.number.isRequired,
-  dogCount: PropTypes.number.isRequired,
+  catIds: PropTypes.array.isRequired,
+  dogIds: PropTypes.array.isRequired,
 
   onDrop: PropTypes.func.isRequired,
-  onDragOver: PropTypes.func.isRequired,
+  //onDragOver: PropTypes.func.isRequired,
 }
