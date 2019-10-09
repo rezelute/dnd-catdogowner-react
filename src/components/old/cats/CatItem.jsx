@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import PropTypes from "prop-types"
-import PetTypes from '../../petTypes'
+import PetTypes from '../../../petTypes'
 
 
 export default class CatItem extends Component

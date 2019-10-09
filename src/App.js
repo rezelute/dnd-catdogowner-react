@@ -1,7 +1,9 @@
 //import logo from './logo.svg';
 import React, { Component } from 'react';
-import CatList from "./components/cats/CatList"
-import DogList from "./components/dogs/DogList"
+// import CatList from "./components/cats/CatList"
+// import DogList from "./components/dogs/DogList"
+import PetList from "./components/pets/PetList"
+import OwnerModal from "./components/ownerModal/OwnerModal"
 import OwnerList from "./components/owners/OwnerList"
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.min.css';
@@ -12,14 +14,14 @@ export default class App extends Component
 {
   state = {
     catList: [
-      { id: 1, name: "felix", breed: "siamese", color: "Black", hasOwner: false },
-      { id: 2, name: "Catalax", breed: "normal", color: "Silver", hasOwner: false },
-      { id: 3, name: "Pizza", breed: "normal", color: "Golden", hasOwner: false },
+      { id: 1, name: "felix", attributes: {breed: "siamese", color: "Black"}, hasOwner: false },
+      { id: 2, name: "Catalax", attributes:{breed: "normal", color: "Silver"}, hasOwner: false },
+      { id: 3, name: "Pizza", attributes:{breed: "normal", color: "Golden"}, hasOwner: false },
     ],
     dogList: [
-      { id: 1, name: "Crispie", breed: "shitzu", color: "yellow", hasOwner: false },
-      { id: 2, name: "Poptart", breed: "Labradoodle", color: "pink", hasOwner: false },
-      { id: 3, name: "Donut", breed: "Labradour", color: "green", hasOwner: false },
+      { id: 1, name: "Crispie", attributes:{breed: "shitzu", color: "yellow"}, hasOwner: false },
+      { id: 2, name: "Poptart", attributes:{breed: "Labradoodle", color: "pink"}, hasOwner: false },
+      { id: 3, name: "Donut", attributes:{breed: "Labradour", color: "green"}, hasOwner: false },
     ],
     ownerList: [
       { id: 1, name: "Hamzah", age: 16, country: "Lebanon", catIds: [], dogIds: [] },
@@ -32,6 +34,13 @@ export default class App extends Component
     draggedItem: {
       petId: -1,
       petType: ""
+    },
+    showOwnerPets: {
+      show: false,
+      ownerId: -1,
+      ownerName: "",
+      catList: [],
+      dogList: []
     }
   }
 
@@ -129,7 +138,7 @@ export default class App extends Component
         catList: updCatList
       });
 
-      this.createNotification("success", `Owner ${updOwner.name} has been allocated ${petType} ${updCat.name}`);
+      this.createNotification("success", `Owner ${updOwner.name} has been allocated ${petType} '${updCat.name}'`);
     }
     else if (petType === PetTypes.Dog) {
       let updDogList = [...this.state.dogList ];
@@ -146,13 +155,8 @@ export default class App extends Component
         dogList: updDogList
       });
 
-      this.createNotification("success", `Owner ${updOwner.name} has been allocated ${petType} ${updDog.name}`);
+      this.createNotification("success", `Owner ${updOwner.name} has been allocated ${petType} '${updDog.name}'`);
     }
-
-    // this.setState({
-    //   owners: updOwners,
-    //   todos: todos.filter(task => task.id !== draggedTask.id),
-    // })
   }
 
   //handles pet renames
@@ -211,25 +215,91 @@ export default class App extends Component
     }
   }
 
+  //handle owner deletions
+  onOwnerDelete = (delOwnerId) =>
+  {
+     this.setState({
+      ownerList: this.state.ownerList.filter(owner => owner.id !== delOwnerId)
+    });
+  }
+  //handle owner rename
+  onOwnerRename = (ownerId, newName) =>
+  {
+    let updList = [...this.state.ownerList ];
+    let updOwner = updList.find(owner => owner.id === ownerId);
+    if (updOwner === undefined) {
+      this.createNotification("error", `Could not find Owner to rename, Owner ID: ${ownerId}`);
+      return;
+    }
+    updOwner.name = newName;
+
+    //update state
+    this.setState({
+      ownerList: updList
+    });
+  }
+
+  //show owner pets in a modal
+  onShowOwnerPets = (ownerId) =>
+  {
+    let ownerCats = [];
+    let ownerDogs = [];
+
+    let ownerItem = this.state.ownerList.find(owner => owner.id === ownerId);
+    if (ownerItem === undefined) {
+      this.createNotification("error", `Could not find owner to get the pets, owner ID: ${ownerId}`);
+      return;
+    }
+
+    ownerItem.catIds.forEach((catId) =>
+    {
+      let catFound = this.state.catList.find(cat => cat.catId === catId);
+      if (catFound !== undefined) {
+        ownerCats.push(catFound);
+      }
+    })
+    ownerItem.dogIds.forEach((dogId) =>
+    {
+      let dogFound = this.state.dogList.find(dog => dog.dogId === dogId);
+      if (dogFound !== undefined) {
+        ownerDogs.push(dogFound);
+      }
+    })
+
+    //update state
+    this.setState({
+      showOwnerPets: {
+        show: true,
+        ownerId: ownerItem.id,
+        ownerName: ownerItem.name,
+        catList: ownerCats,
+        dogList: ownerDogs
+      }
+    });
+  }
+
   render()
   {
     return (
       <main>
+        {this.state.showOwnerPets.show &&
+          <OwnerModal ownerId={this.state.showOwnerPets.ownerId} ownerName={this.state.showOwnerPets.ownerName} catList={this.state.showOwnerPets.catList} dogList={this.state.showOwnerPets.dogList}/>
+        }
         <ToastContainer closeOnClick/>
 
         <section id="sidebar-left">
           <h2>Cats</h2>
-          <CatList list={this.state.catList} onDrag={this.onDrag} onPetRename={this.onPetRename} onPetDelete={this.onPetDelete}/>
+          <PetList animal={PetTypes.Cat} list={this.state.catList} onDrag={this.onDrag} onPetRename={this.onPetRename} onPetDelete={this.onPetDelete}/>
         </section>
 
         <section id="pageArea">
           <h2>Owners</h2>
-          <OwnerList ownerList={this.state.ownerList} onDrop={this.onDrop} />
+          <OwnerList ownerList={this.state.ownerList} onDrop={this.onDrop} onOwnerRename={this.onOwnerRename} onOwnerDelete={this.onOwnerDelete} onShowOwnerPets={this.onShowOwnerPets} />
         </section>
 
         <section id="sidebar-right">
           <h2>Dogs</h2>
-          <DogList list={this.state.dogList} onDrag={this.onDrag} />
+          <PetList animal={PetTypes.Dog} list={this.state.dogList} onDrag={this.onDrag} onPetRename={this.onPetRename} onPetDelete={this.onPetDelete}/>
         </section>
 
       </main>

@@ -86,6 +86,7 @@ ul.pet-list > li{
     }
     //label
     span{
+      text-transform: capitalize;
       font-weight: bold;
     }
   }
@@ -101,7 +102,7 @@ ul.pet-list > li{
 
 
 //left cat specific
-ul.pet-list.cats > li{
+ul.pet-list.cat > li{
   border: 1px solid $sidebar-left-box-dark;
   background: $sidebar-left-box-light;
 
@@ -113,7 +114,7 @@ ul.pet-list.cats > li{
   }
 }
 //right dog specific
-ul.pet-list.dogs > li{
+ul.pet-list.dog > li{
   border: 1px solid $sidebar-right-box-dark;
   background: $sidebar-right-box-light;
 

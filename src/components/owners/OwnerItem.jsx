@@ -39,15 +39,21 @@ export default class OwnerItem extends Component
     this.props.onDrop();
   }
 
+  promptNewOwnerName = (ownerId, oldName) =>
+  {
+    var newName = prompt(`Please enter a new name for '${oldName}'`, "");
+    if (newName != null) {
+      this.props.onOwnerRename(ownerId, newName);
+    }
+  }
+
   render()
   {
     const { id, name, country, age, catIds, dogIds } = this.props;
 
     return (
       <li>
-        <div className={(this.state.isDragOver ? "dragOver" : "")}
-          onDrop={this.onDrop} onDragOver={this.onDragOver} onDragLeave={this.onDragLeave}
-        >
+        <div className={(this.state.isDragOver ? "dragOver" : "")} onDrop={this.props.onDrop.bind(this,id)} onDragOver={this.onDragOver} onDragLeave={this.onDragLeave}>
           <div className="owner-attributes">
             <h3 className="owner-name">{name}</h3>
             <div><span>Age:</span> {age}</div>
@@ -74,5 +80,8 @@ OwnerItem.propTypes = {
   dogIds: PropTypes.array.isRequired,
 
   onDrop: PropTypes.func.isRequired,
+  onOwnerRename: PropTypes.func.isRequired,
+  onOwnerDelete: PropTypes.func.isRequired,
+  onShowOwnerPets: PropTypes.func.isRequired,
   //onDragOver: PropTypes.func.isRequired,
 }
