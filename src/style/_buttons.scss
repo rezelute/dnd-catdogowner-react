@@ -1,4 +1,4 @@
-button{
+button, input[type=submit]{
   font-size:100%;
 }
 
@@ -28,4 +28,32 @@ button.normal{
   &:hover{
     border: 1px solid #333;
   }
+}
+
+button.add-new-pet{
+  display: block;
+  margin:0px auto;
+  height: 3em;
+  width: 3em;
+  border:0;
+  border-radius: 50%;
+
+  &.cat{
+    background: $sidebar-left-box-dark url("../assets/images/add-new.svg") no-repeat center;
+  }
+
+  &.dog{
+    background: $sidebar-right-box-dark url("../assets/images/add-new.svg") no-repeat center;
+  }
+}
+
+button.add-new-owner{
+  display: block;
+  margin:0px auto;
+  height: 3em;
+  width: 3em;
+  border:0;
+  //border-radius: 50%;
+  background: url("../assets/images/add-new-person.svg") no-repeat center;
+  padding: 0.5em;
 }

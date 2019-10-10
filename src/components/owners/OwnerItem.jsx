@@ -81,7 +81,7 @@ export default class OwnerItem extends Component
 
 //PropTypes
 OwnerItem.propTypes = {
-  id: PropTypes.number.isRequired,
+  id: PropTypes.string.isRequired,
   name: PropTypes.string.isRequired,
   age: PropTypes.number.isRequired,
   country: PropTypes.string.isRequired,

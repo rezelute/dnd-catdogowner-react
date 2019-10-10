@@ -3,42 +3,56 @@ import React, { Component } from 'react';
 // import CatList from "./components/cats/CatList"
 // import DogList from "./components/dogs/DogList"
 import PetList from "./components/pets/PetList"
-import OwnerModal from "./components/ownerModal/OwnerModal"
+import OwnerPets from "./components/modal/ownerPets/OwnerPets"
 import OwnerList from "./components/owners/OwnerList"
+import CreatePet from "./components/modal/createPet/CreatePet"
+import CreateOwner from "./components/modal/createOwner/CreateOwner"
 import AppData from "./js/appData"
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.min.css';
-import PetTypes from './petTypes'
-import './style/app.scss';
+import { ToastContainer, toast } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.min.css'
+import PetTypes from './js/petTypes'
+import UUID from 'uuid'
+import './style/app.scss'
 
 export default class App extends Component
 {
   state = {
     catList: [
-      { id: 0, name: "", attributes: { breed: "", color: "" } },
+      { id: "0", name: "", attributes: { breed: "", color: "" } },
     ],
     dogList: [
-      { id: 0, name: "", attributes: { breed: "", color: "" } },
+      { id: "0", name: "", attributes: { breed: "", color: "" } },
     ],
     ownerList: [
-      { id: 0, name: "", age: -1, country: "", catIds: [], dogIds: [] },
+      { id: "0", name: "", age: -1, country: "", catIds: [], dogIds: [] },
     ],
     draggedItem: {
-      petId: -1,
+      petId: "-1",
       petType: ""
     },
-    showOwnerPets: {
-      open: false,
-      ownerId: 0,
-      //ownerName: "",
-      //catList: [],
-      //dogList: []
-    }
+    modal: {
+      active: "", //ownerPets | createOwner | createPet | ""
+      ownerPets: {
+        ownerId: "-1"
+      }
+    },
+    // showOwnerPets: {
+    //   open: false,
+    //   ownerId: 0,
+    //   //ownerName: "",
+    //   //catList: [],
+    //   //dogList: []
+    // }
   };
 
   componentDidMount()
   {
-    this.setState(AppData.getData());
+    const data = AppData.getData();
+    this.setState({
+      catList: data.catList,
+      dogList: data.dogList,
+      ownerList: data.ownerList
+    });
   }
 
   //create notifications
@@ -234,12 +248,18 @@ export default class App extends Component
     });
   }
 
+  openModal = (createType) => //createType = createOwner | createPet
+  {
+    this.setState({
+      modal: {
+        active: createType
+      }
+    })
+  }
+  
   //show owner pets in a modal
   onShowOwnerPets = (ownerId) =>
   {
-    let ownerCats = [];
-    let ownerDogs = [];
-
     let ownerItem = this.state.ownerList.find(owner => owner.id === ownerId);
     if (ownerItem === undefined) {
       this.createNotification("error", `Could not find owner to get the pets, owner ID: ${ownerId}`);
@@ -248,38 +268,13 @@ export default class App extends Component
 
     //update state
     this.setState({
-      showOwnerPets: {
-        open: true,
-        ownerId: ownerItem.id,
+      modal: {
+        active: "ownerPets",
+        ownerPets: {
+          ownerId: ownerId
+        }
       }
     });
-
-    // ownerItem.catIds.forEach((catId) =>
-    // {
-    //   let catFound = this.state.catList.find(cat => cat.id === catId);
-    //   console.log("catfound: ", catFound);
-    //   if (catFound !== undefined) {
-    //     ownerCats.push(catFound);
-    //   }
-    // })
-    // ownerItem.dogIds.forEach((dogId) =>
-    // {
-    //   let dogFound = this.state.dogList.find(dog => dog.id === dogId);
-    //   if (dogFound !== undefined) {
-    //     ownerDogs.push(dogFound);
-    //   }
-    // })
-
-    // //update state
-    // this.setState({
-    //   showOwnerPets: {
-    //     open: true,
-    //     ownerId: ownerItem.id,
-    //     ownerName: ownerItem.name,
-    //     catList: ownerCats,
-    //     dogList: ownerDogs
-    //   }
-    // });
   }
 
   //remove pet from owner
@@ -323,14 +318,61 @@ export default class App extends Component
   onCloseModal = () =>
   {
     this.setState({
-      showOwnerPets: {
-        open: false,
-        ownerId: -1,
-        ownerName: "",
-        catList: [],
-        dogList: []
+      modal: {
+        active: "",
+        ownerPets: {
+          ownerId:-1
+        }
       }
     })
+  }
+
+
+  //create new pet
+  onCreatePet = (animal, name, breed, color) =>
+  {
+    let newPet = {
+      id: UUID.v4(),
+      name,
+      breed,
+      color
+    }
+    
+    if (animal === PetTypes.Cat) {
+      this.setState({
+        catList: [...this.state.catList, newPet]
+      })
+    }
+    else if (animal === PetTypes.Dog) {
+      this.setState({
+        dogList: [...this.state.dogList, newPet]
+      })
+    }
+  }
+  
+  //create new owner
+  onCreateOwner = (name, country, age) =>
+  {
+    let newOwner = {
+      id: UUID.v4(),
+      name,
+      country,
+      age,
+      catIds: [],
+      dogIds: []
+    }
+
+    //update owners list and close modal
+    this.setState({
+      ownerList: [...this.state.ownerList, newOwner],
+      modal: {
+        active: ""
+      }
+    });
+
+
+
+    this.createNotification("success", `New owner '${name}' has been added to the owners list`); 
   }
 
   render()
@@ -357,8 +399,12 @@ export default class App extends Component
     let modal_cats = [];
     let modal_dogs = [];
     let modal_ownerName = "";
-    if (this.state.showOwnerPets.open) {
-      let modal_owner = this.state.ownerList.find(owner => owner.id === this.state.showOwnerPets.ownerId);
+    if (this.state.modal.active === "ownerPets") {
+      let ownerIdToQuery = this.state.modal.ownerPets.ownerId;
+      let modal_owner = this.state.ownerList.find(owner => owner.id === ownerIdToQuery);
+      
+      modal_ownerName = modal_owner.name;
+      
       modal_owner.catIds.forEach((catId) =>
       {
         let catFound = this.state.catList.find(cat => cat.id === catId);
@@ -379,27 +425,52 @@ export default class App extends Component
 
     return (
       <main>
-        <OwnerModal
-          open={this.state.showOwnerPets.open} ownerId={this.state.showOwnerPets.ownerId} ownerName={modal_ownerName} catList={modal_cats} dogList={modal_dogs}
-          onPetRename={this.onPetRename} onPetDelete={this.onPetDelete} onRemoveOwnerPet={this.onRemoveOwnerPet} onCloseModal={this.onCloseModal}
-        />
-        <ToastContainer closeOnClick />
+        <div className={"modal" + (this.state.modal.active!=="" ? " open" : "")}>
+          <div className="modal-content">
+            <button className="modal-btn-close" onClick={this.onCloseModal}>Close Modal</button>
+            
+            {this.state.modal.active === "createPet" &&
+              <CreatePet onCreatePet={this.onCreatePet}/>
+            }
+
+            {this.state.modal.active === "createOwner" &&
+              <CreateOwner onCreateOwner={this.onCreateOwner}/>
+            }
+
+            {this.state.modal.active === "ownerPets" &&
+              <OwnerPets
+              open={this.state.modal.active==="ownerPets"} ownerId={this.state.modal.ownerPets.ownerId} ownerName={modal_ownerName} catList={modal_cats} dogList={modal_dogs}
+              onPetRename={this.onPetRename} onPetDelete={this.onPetDelete} onRemoveOwnerPet={this.onRemoveOwnerPet} onCloseModal={this.onCloseModal}
+              />
+            }
+          </div>
+        </div>
 
         <section id="sidebar-left">
+          <div className="sidebar-controls">
+            <button onClick={this.openModal.bind(this, 'createPet')} className="add-new-pet cat" title="Add new pet"></button>
+          </div>
           <h2>Cats</h2>
           <PetList page="sidebar" animal={PetTypes.Cat} list={unassignedCatList} onDrag={this.onDrag} onPetRename={this.onPetRename} onPetDelete={this.onPetDelete} />
         </section>
 
         <section id="pageArea">
+          <div className="sidebar-controls">
+          <button onClick={this.openModal.bind(this, 'createOwner')} className="add-new-owner" title="Add new person"></button>
+          </div>
           <h2>Owners</h2>
           <OwnerList ownerList={this.state.ownerList} onDrop={this.onDrop} onOwnerRename={this.onOwnerRename} onOwnerDelete={this.onOwnerDelete} onShowOwnerPets={this.onShowOwnerPets} />
         </section>
 
         <section id="sidebar-right">
+          <div className="sidebar-controls">
+            <button onClick={this.openModal.bind(this, 'createPet')} className="add-new-pet dog" title="Add new pet"></button>
+          </div>
           <h2>Dogs</h2>
           <PetList page="sidebar" animal={PetTypes.Dog} list={unassignedDogList} onDrag={this.onDrag} onPetRename={this.onPetRename} onPetDelete={this.onPetDelete} />
         </section>
 
+        <ToastContainer closeOnClick />
       </main>
     );
   }

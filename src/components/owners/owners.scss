@@ -23,7 +23,7 @@
     border-radius: 1em;
     background: $pagearea-box-bg;
     border:1px solid $pagearea-box-border;
-    padding: 1.5em;
+    padding: 1.5em 1.5em 3em 1.5em;
 
     &.dragOver{
       border:1px solid green;
@@ -75,5 +75,6 @@
     right: 0.6em;
     margin:0;
     opacity: 0.3;
+    font-size: 90%;
   }
 }

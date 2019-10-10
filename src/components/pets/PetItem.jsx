@@ -62,7 +62,7 @@ export default class PetItem extends Component
 //PropTypes
 PetItem.propTypes = {
   page: PropTypes.string.isRequired,
-  id: PropTypes.number.isRequired,
+  id: PropTypes.string.isRequired,
   animal: PropTypes.string.isRequired, //is cat, dog etc.
   name: PropTypes.string.isRequired,
   attributes: PropTypes.object.isRequired, //breed, colour, etc

@@ -1,11 +1,10 @@
 import React, { Component } from 'react'
-//import PetItem from "../pets/PetItem";
-import PetList from "../pets/PetList";
-import PetTypes from '../../petTypes'
+import PetList from "../../pets/PetList";
+import PetTypes from '../../../js/petTypes'
 import PropTypes from "prop-types"
-import './ownerModal.scss';
+import './ownerPets.scss';
 
-export default class OwnerModal extends Component
+export default class OwnerPets extends Component
 {
 
   onRemoveOwnerPet = (petId, animal) =>
@@ -19,10 +18,11 @@ export default class OwnerModal extends Component
     const { open, ownerId, ownerName, catList, dogList } = this.props;
 
     return (
-      <section id="owner-pets-modal" className={open ? "open" : ""}>
-        <div id="owner-pets-modal-content">
-          <button id="owner-pets-modal-close" onClick={this.props.onCloseModal}>Close Modal</button>
-          <h2>Pets list for owner: {ownerName} (Id: {ownerId})</h2>
+      <section id="owner-pets">
+          <h2>
+            Pets list for owner: {ownerName}
+            <small id="owner-pets-person-id">Owner Id: {ownerId}</small>
+          </h2>
 
           <section id="owner-pets-cats">
             <h3>Owner cat(s)</h3>
@@ -49,9 +49,6 @@ export default class OwnerModal extends Component
               <p>This owner has not been allocated any dogs yet.</p>
             }
           </section>
-
-
-        </div>
       </section>
     )
   }
@@ -59,7 +56,7 @@ export default class OwnerModal extends Component
 
 
 //PropTypes
-OwnerModal.propTypes = {
+OwnerPets.propTypes = {
   open: PropTypes.bool.isRequired,
   ownerId: PropTypes.number.isRequired,
   ownerName: PropTypes.string.isRequired,

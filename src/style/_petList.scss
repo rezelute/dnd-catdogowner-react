@@ -52,6 +52,16 @@ ul.pet-list{
 //each pet item
 ul.pet-list > li > div{
   position: relative;
+  padding-bottom: 1em; //cater for absolute positioned id
+  
+  //show buttons on hover
+  &:hover{
+    .pet-buttons{
+      visibility:visible;
+      opacity:1;
+      transition:visibility 0.2s linear, opacity 0.2s linear;
+    }
+  }
 
   //functional buttons absolutely positioned
   .pet-buttons{
@@ -81,15 +91,6 @@ ul.pet-list > li > div{
         background: #fff url("../assets/images/delete.svg") no-repeat center;
         background-size: 80%;
       }
-    }
-  }
-
-  //show buttons on hover
-  &:hover{
-    .pet-buttons{
-      visibility:visible;
-      opacity:1;
-      transition:visibility 0.2s linear, opacity 0.2s linear;
     }
   }
 
@@ -127,6 +128,7 @@ ul.pet-list > li > div{
     bottom: 0;
     right: 0.2em;
     margin:0;
+    font-size: 90%;
   }
 }
 
