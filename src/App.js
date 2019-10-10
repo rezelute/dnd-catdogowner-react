@@ -293,9 +293,22 @@ export default class App extends Component
       updOwner.dogIds = updOwner.dogIds.filter(dogId => dogId !== petId);
     }
 
-    //update state
+    //update owner state
     this.setState({
       ownerList: updOwnerList
+    });
+
+    //update showOwnerPets modal state
+    let updShowOwnerPets = JSON.parse(JSON.stringify(this.state.showOwnerPets));
+    if (petType === PetTypes.Cat) {
+      updShowOwnerPets.catList = updShowOwnerPets.catList.filter(cat => cat.id !== petId);
+    }
+    else if (petType === PetTypes.Dog) {
+      updShowOwnerPets.dogList = updShowOwnerPets.dogList.filter(dog => dog.id !== petId);
+    }
+
+    this.setState({
+      showOwnerPets: updShowOwnerPets
     });
   }
 
