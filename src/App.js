@@ -5,6 +5,7 @@ import React, { Component } from 'react';
 import PetList from "./components/pets/PetList"
 import OwnerModal from "./components/ownerModal/OwnerModal"
 import OwnerList from "./components/owners/OwnerList"
+import AppData from "./js/appData"
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.min.css';
 import PetTypes from './petTypes'
@@ -14,34 +15,30 @@ export default class App extends Component
 {
   state = {
     catList: [
-      { id: 1, name: "felix", attributes: {breed: "siamese", color: "Black"}, hasOwner: false },
-      { id: 2, name: "Catalax", attributes:{breed: "normal", color: "Silver"}, hasOwner: false },
-      { id: 3, name: "Pizza", attributes:{breed: "normal", color: "Golden"}, hasOwner: false },
+      { id: 0, name: "", attributes: { breed: "", color: "" } },
     ],
     dogList: [
-      { id: 1, name: "Crispie", attributes:{breed: "shitzu", color: "yellow"}, hasOwner: false },
-      { id: 2, name: "Poptart", attributes:{breed: "Labradoodle", color: "pink"}, hasOwner: false },
-      { id: 3, name: "Donut", attributes:{breed: "Labradour", color: "green"}, hasOwner: false },
+      { id: 0, name: "", attributes: { breed: "", color: "" } },
     ],
     ownerList: [
-      { id: 1, name: "Hamzah", age: 16, country: "Lebanon", catIds: [], dogIds: [] },
-      { id: 2, name: "Adam", age: 32, country: "Egypt", catIds: [], dogIds: [] },
-      { id: 3, name: "Laura", age: 33, country: "United Kingdom", catIds: [], dogIds: [] },
-      { id: 4, name: "Denise", age: 54, country: "United Kingdom", catIds: [], dogIds: [] },
-      { id: 5, name: "Hassan", age: 29, country: "United Kingdom", catIds: [], dogIds: [] },
-      { id: 6, name: "Ali", age: 59, country: "Lebanon", catIds: [], dogIds: [] },
+      { id: 0, name: "", age: -1, country: "", catIds: [], dogIds: [] },
     ],
     draggedItem: {
       petId: -1,
       petType: ""
     },
     showOwnerPets: {
-      show: false,
-      ownerId: -1,
+      open: false,
+      ownerId: 0,
       ownerName: "",
       catList: [],
       dogList: []
     }
+  };
+
+  componentDidMount()
+  {
+    this.setState(AppData.getData());
   }
 
   //create notifications
@@ -101,7 +98,7 @@ export default class App extends Component
     console.log("Dropped on owner ID: ", droppedOwnerId);
 
     //assign pet to owner
-    let updOwners = [...this.state.ownerList ];
+    let updOwners = [...this.state.ownerList];
     let updOwner = updOwners.find(owner => owner.id === droppedOwnerId);
     if (updOwner === undefined) {
       this.createNotification("error", `Could not find Owner to update, Owner ID: ${droppedOwnerId}`);
@@ -125,7 +122,7 @@ export default class App extends Component
     //set the hasOwner on the pet to true
     let updCat, updDog;
     if (petType === PetTypes.Cat) {
-      let updCatList = [...this.state.catList ];
+      let updCatList = [...this.state.catList];
       updCat = updCatList.find(cat => cat.id === petId);
       if (updCat === undefined) {
         this.createNotification("error", `Could not find Cat to update, Cat ID: ${petId}`);
@@ -141,7 +138,7 @@ export default class App extends Component
       this.createNotification("success", `Owner ${updOwner.name} has been allocated ${petType} '${updCat.name}'`);
     }
     else if (petType === PetTypes.Dog) {
-      let updDogList = [...this.state.dogList ];
+      let updDogList = [...this.state.dogList];
       updDog = updDogList.find(dog => dog.id === petId);
       if (updDog === undefined) {
         this.createNotification("error", `Could not find Dog to update, Dog ID: ${petId}`);
@@ -165,15 +162,13 @@ export default class App extends Component
     console.log("Pet name change - ID: ", petId, ", type: ", petType, ", new name: ", newName);
 
     if (petType === PetTypes.Cat) {
-      let updList = [...this.state.catList ];
+      let updList = [...this.state.catList];
       let updCat = updList.find(cat => cat.id === petId);
       if (updCat === undefined) {
         this.createNotification("error", `Could not find Cat to rename, Cat ID: ${petId}`);
         return;
       }
       updCat.name = newName;
-      
-      console.log("updList: ", updList);
 
       //update state
       this.setState({
@@ -218,14 +213,14 @@ export default class App extends Component
   //handle owner deletions
   onOwnerDelete = (delOwnerId) =>
   {
-     this.setState({
+    this.setState({
       ownerList: this.state.ownerList.filter(owner => owner.id !== delOwnerId)
     });
   }
   //handle owner rename
   onOwnerRename = (ownerId, newName) =>
   {
-    let updList = [...this.state.ownerList ];
+    let updList = [...this.state.ownerList];
     let updOwner = updList.find(owner => owner.id === ownerId);
     if (updOwner === undefined) {
       this.createNotification("error", `Could not find Owner to rename, Owner ID: ${ownerId}`);
@@ -253,14 +248,15 @@ export default class App extends Component
 
     ownerItem.catIds.forEach((catId) =>
     {
-      let catFound = this.state.catList.find(cat => cat.catId === catId);
+      let catFound = this.state.catList.find(cat => cat.id === catId);
+      console.log("catfound: ", catFound);
       if (catFound !== undefined) {
         ownerCats.push(catFound);
       }
     })
     ownerItem.dogIds.forEach((dogId) =>
     {
-      let dogFound = this.state.dogList.find(dog => dog.dogId === dogId);
+      let dogFound = this.state.dogList.find(dog => dog.id === dogId);
       if (dogFound !== undefined) {
         ownerDogs.push(dogFound);
       }
@@ -269,7 +265,7 @@ export default class App extends Component
     //update state
     this.setState({
       showOwnerPets: {
-        show: true,
+        open: true,
         ownerId: ownerItem.id,
         ownerName: ownerItem.name,
         catList: ownerCats,
@@ -278,18 +274,75 @@ export default class App extends Component
     });
   }
 
+  //remove pet from owner
+  onRemoveOwnerPet = (ownerId, petId, petType) =>
+  {
+    console.log("Remove pet ID: ", petId, ", type: ", petType, " - from owner id: ", ownerId);
+
+    let updOwnerList = [...this.state.ownerList];
+    let updOwner = updOwnerList.find(owner => owner.id === ownerId);
+    if (updOwner === undefined) {
+      this.createNotification("error", `Could not find owner to remove pet from, owner ID: ${ownerId}`);
+      return;
+    }
+
+    if (petType === PetTypes.Cat) {
+      updOwner.catIds = updOwner.catIds.filter(catId => catId !== petId);
+    }
+    else if (petType === PetTypes.Dog) {
+      updOwner.dogIds = updOwner.dogIds.filter(dogId => dogId !== petId);
+    }
+
+    //update state
+    this.setState({
+      ownerList: updOwnerList
+    });
+  }
+
+  //pet owner modal closed
+  onCloseModal = () =>
+  {
+    this.setState({
+      showOwnerPets: {
+        open: false,
+        ownerId: -1,
+        ownerName: "",
+        catList: [],
+        dogList: []
+      }
+    })
+  }
+
   render()
   {
+    let unassignedCatList = this.state.catList.filter((cat) =>
+    {
+      let ownerFound = this.state.ownerList.find(owner => owner.catIds.find(ownCatId => ownCatId === cat.id));
+      if (ownerFound === undefined) { //owner was NOT found > add this cat to list
+        return true;
+      }
+      return false;
+    });
+    let unassignedDogList = this.state.dogList.filter((dog) =>
+    {
+      let ownerFound = this.state.ownerList.find(owner => owner.dogIds.find(ownDogId => ownDogId === dog.id));
+      if (ownerFound === undefined) { //owner was NOT found > add this dog to list
+        return true;
+      }
+      return false;
+    });
+
     return (
       <main>
-        {this.state.showOwnerPets.show &&
-          <OwnerModal ownerId={this.state.showOwnerPets.ownerId} ownerName={this.state.showOwnerPets.ownerName} catList={this.state.showOwnerPets.catList} dogList={this.state.showOwnerPets.dogList}/>
-        }
-        <ToastContainer closeOnClick/>
+        <OwnerModal
+          open={this.state.showOwnerPets.open} ownerId={this.state.showOwnerPets.ownerId} ownerName={this.state.showOwnerPets.ownerName} catList={this.state.showOwnerPets.catList} dogList={this.state.showOwnerPets.dogList}
+          onPetRename={this.onPetRename} onPetDelete={this.onPetDelete} onRemoveOwnerPet={this.onRemoveOwnerPet} onCloseModal={this.onCloseModal}
+        />
+        <ToastContainer closeOnClick />
 
         <section id="sidebar-left">
           <h2>Cats</h2>
-          <PetList animal={PetTypes.Cat} list={this.state.catList} onDrag={this.onDrag} onPetRename={this.onPetRename} onPetDelete={this.onPetDelete}/>
+          <PetList page="sidebar" animal={PetTypes.Cat} list={unassignedCatList} onDrag={this.onDrag} onPetRename={this.onPetRename} onPetDelete={this.onPetDelete} />
         </section>
 
         <section id="pageArea">
@@ -299,7 +352,7 @@ export default class App extends Component
 
         <section id="sidebar-right">
           <h2>Dogs</h2>
-          <PetList animal={PetTypes.Dog} list={this.state.dogList} onDrag={this.onDrag} onPetRename={this.onPetRename} onPetDelete={this.onPetDelete}/>
+          <PetList page="sidebar" animal={PetTypes.Dog} list={unassignedDogList} onDrag={this.onDrag} onPetRename={this.onPetRename} onPetDelete={this.onPetDelete} />
         </section>
 
       </main>

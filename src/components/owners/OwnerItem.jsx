@@ -28,15 +28,16 @@ export default class OwnerItem extends Component
   }
 
   //ondrop of item in the box > prevent default (default is redirect) then pass up to parent
-  onDrop = (event) => {
-    event.preventDefault();
+  onDrop = (ownerId) => {
+    //event.preventDefault();
 
     //remove highlight
     this.setState({
       isDragOver: false
     });
 
-    this.props.onDrop();
+    console.log("ownerId ", ownerId);
+    this.props.onDrop(ownerId);
   }
 
   promptNewOwnerName = (ownerId, oldName) =>
@@ -53,17 +54,25 @@ export default class OwnerItem extends Component
 
     return (
       <li>
-        <div className={(this.state.isDragOver ? "dragOver" : "")} onDrop={this.props.onDrop.bind(this,id)} onDragOver={this.onDragOver} onDragLeave={this.onDragLeave}>
+        <div className={(this.state.isDragOver ? "dragOver" : "")} onDrop={this.onDrop.bind(this,id)} onDragOver={this.onDragOver} onDragLeave={this.onDragLeave}>
+          
           <div className="owner-attributes">
             <h3 className="owner-name">{name}</h3>
-            <div><span>Age:</span> {age}</div>
-            <div><span>Country:</span> {country}</div>
+            <div><span className="label">Age:</span> {age}</div>
+            <div><span className="label">Country:</span> {country}</div>
           </div>
-          <div className="owner-pets">
-            <div><span>Cat count:</span> {catIds.length}</div>
-            <div><span>Dog count:</span> {dogIds.length}</div>
+
+          <div className="owner-pets-count">
+            <div><span className="label">Cat count:</span> {catIds.length}</div>
+            <div><span className="label">Dog count:</span> {dogIds.length}</div>
           </div>
+
           <span className="owner-id">{id}</span>
+
+          <div className="owner-show-pets">
+            <button className="normal" onClick={this.props.onShowOwnerPets.bind(this, id)}>Show pets</button>
+          </div>
+
         </div>
       </li>
     )

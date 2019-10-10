@@ -23,11 +23,16 @@
     border-radius: 1em;
     background: $pagearea-box-bg;
     border:1px solid $pagearea-box-border;
-    padding: 1em 1em 5em 1em;
+    padding: 1.5em;
 
     &.dragOver{
       border:1px solid green;
     }
+  }
+
+  //spacing between each div section of the owner
+  >div > div:not(:first-of-type){
+    margin-top: 1.5em;
   }
 
   //top property title (header)
@@ -52,32 +57,15 @@
 
   .owner-attributes{
     //every property (color, breed etc)
-    >*{
+    >*:not(:last-child){
       margin-bottom: 0.6em;
-
-      &:last-child{
-        margin-bottom: 0;
-      }
-    }
-    //label
-    span{
-      font-weight: bold;
     }
   }
 
-  .owner-pets{
-    margin-top: 1.5em;
+  .owner-pets-count{
     //every property (color, breed etc)
-    >*{
+    >*:not(:last-child){
       margin-bottom: 0.6em;
-
-      &:last-child{
-        margin-bottom: 0;
-      }
-    }
-    //label
-    span{
-      font-weight: bold;
     }
   }
 

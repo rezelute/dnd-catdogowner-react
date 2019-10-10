@@ -1,6 +1,7 @@
 //APP LEVEL AND COMMON CSS
 @import "./variables";
 @import "./petList";
+@import "./buttons";
 
 /* COMMONS */
 .hide{display:none;}
@@ -17,6 +18,11 @@ a{
 //HEADINGS
 //top heading on each left, pagearea and right
 main > section > h2{text-align: center;}
+
+/* Others */
+span.label{
+  font-weight: bold;
+}
 
 /* MAIN */
 main{

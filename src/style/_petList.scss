@@ -1,21 +1,56 @@
 @import "./variables";
 
-/* SIDEBAR COMMON */
-//PET LIST
-ul.pet-list{
+//SIDEBAR PAGE ONLY
+ul.pet-list.sidebar{
   padding-top:3em;
-  //display: flex;
-	//flex-direction: column;
-	//align-items: center;
-	width: 100%;
-	justify-content: flex-start;
-	overflow-x: hidden;
+  overflow-x: hidden;
   overflow-y: auto;
+
+  >li{
+    margin-bottom: 2.5em;
+
+    //show drag hand on draggable area
+    .pet-draggable{
+      cursor: grab;
+    }
+  }
+}
+
+//OWNER PAGE SPECIFIC
+ul.pet-list.owner{
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+
+  >li{
+    width: 33.3333%;
+    padding:1em;
+
+    //remove owner from pet button
+    .remove-owner-pet{
+      button{
+        &:before{
+          content: "";
+          display: inline-block;
+          background: url("../assets/images/unlink.svg") no-repeat center;
+          background-size: contain;
+          width: 0.8em;
+          height: 0.8em;
+          margin-right: 0.5em;
+          vertical-align: middle;
+        }
+      }
+    }
+  }
+}
+
+//COMMON BETWEEN ALL PAGES
+ul.pet-list{
+  width: 100%;
 }
 
 //each pet item
-ul.pet-list > li{
-  margin-bottom: 2.5em;
+ul.pet-list > li > div{
   position: relative;
 
   //functional buttons absolutely positioned
@@ -58,11 +93,6 @@ ul.pet-list > li{
     }
   }
 
-  //show drag hand on draggable area
-  .pet-draggable{
-    cursor: grab;
-  }
-
   //top property title (header)
   .pet-name{
     text-align: center;
@@ -101,8 +131,10 @@ ul.pet-list > li{
 }
 
 
+
+
 //left cat specific
-ul.pet-list.cat > li{
+ul.pet-list.cat > li > div{
   border: 1px solid $sidebar-left-box-dark;
   background: $sidebar-left-box-light;
 
@@ -114,7 +146,7 @@ ul.pet-list.cat > li{
   }
 }
 //right dog specific
-ul.pet-list.dog > li{
+ul.pet-list.dog > li > div{
   border: 1px solid $sidebar-right-box-dark;
   background: $sidebar-right-box-light;
 
