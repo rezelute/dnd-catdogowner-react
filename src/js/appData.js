@@ -26,16 +26,16 @@ export default class AppData {
       },
       showOwnerPets: {
         open: false,
-        ownerId: 11,
-        ownerName: "Penis",
-        catList: [
-          { id: 1, name: "felix", attributes: { breed: "siamese", color: "Black" } },
-          { id: 2, name: "Catalax", attributes: { breed: "normal", color: "Silver" } },
-        ],
-        dogList: [
-          { id: 1, name: "Crispie", attributes: { breed: "shitzu", color: "yellow" } },
-          { id: 2, name: "Poptart", attributes: { breed: "Labradoodle", color: "pink" } },
-        ]
+        ownerId: -1,
+        // ownerName: "Penis",
+        // catList: [
+        //   { id: 1, name: "felix", attributes: { breed: "siamese", color: "Black" } },
+        //   { id: 2, name: "Catalax", attributes: { breed: "normal", color: "Silver" } },
+        // ],
+        // dogList: [
+        //   { id: 1, name: "Crispie", attributes: { breed: "shitzu", color: "yellow" } },
+        //   { id: 2, name: "Poptart", attributes: { breed: "Labradoodle", color: "pink" } },
+        // ]
       }
     }
   } 

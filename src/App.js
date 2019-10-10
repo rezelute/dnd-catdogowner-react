@@ -30,9 +30,9 @@ export default class App extends Component
     showOwnerPets: {
       open: false,
       ownerId: 0,
-      ownerName: "",
-      catList: [],
-      dogList: []
+      //ownerName: "",
+      //catList: [],
+      //dogList: []
     }
   };
 
@@ -87,7 +87,7 @@ export default class App extends Component
   //on drop in one of the owners > assign the pet to the owner
   onDrop = (droppedOwnerId) =>
   {
-    const { petId, petType } = { ...this.state.draggedItem };
+    const { petId, petType } = JSON.parse(JSON.stringify(this.state.draggedItem));
 
     //another method (firefox likes this)
     //var data = event.dataTransfer.getData("text");
@@ -246,32 +246,40 @@ export default class App extends Component
       return;
     }
 
-    ownerItem.catIds.forEach((catId) =>
-    {
-      let catFound = this.state.catList.find(cat => cat.id === catId);
-      console.log("catfound: ", catFound);
-      if (catFound !== undefined) {
-        ownerCats.push(catFound);
-      }
-    })
-    ownerItem.dogIds.forEach((dogId) =>
-    {
-      let dogFound = this.state.dogList.find(dog => dog.id === dogId);
-      if (dogFound !== undefined) {
-        ownerDogs.push(dogFound);
-      }
-    })
-
     //update state
     this.setState({
       showOwnerPets: {
         open: true,
         ownerId: ownerItem.id,
-        ownerName: ownerItem.name,
-        catList: ownerCats,
-        dogList: ownerDogs
       }
     });
+
+    // ownerItem.catIds.forEach((catId) =>
+    // {
+    //   let catFound = this.state.catList.find(cat => cat.id === catId);
+    //   console.log("catfound: ", catFound);
+    //   if (catFound !== undefined) {
+    //     ownerCats.push(catFound);
+    //   }
+    // })
+    // ownerItem.dogIds.forEach((dogId) =>
+    // {
+    //   let dogFound = this.state.dogList.find(dog => dog.id === dogId);
+    //   if (dogFound !== undefined) {
+    //     ownerDogs.push(dogFound);
+    //   }
+    // })
+
+    // //update state
+    // this.setState({
+    //   showOwnerPets: {
+    //     open: true,
+    //     ownerId: ownerItem.id,
+    //     ownerName: ownerItem.name,
+    //     catList: ownerCats,
+    //     dogList: ownerDogs
+    //   }
+    // });
   }
 
   //remove pet from owner
@@ -298,18 +306,17 @@ export default class App extends Component
       ownerList: updOwnerList
     });
 
-    //update showOwnerPets modal state
-    let updShowOwnerPets = JSON.parse(JSON.stringify(this.state.showOwnerPets));
-    if (petType === PetTypes.Cat) {
-      updShowOwnerPets.catList = updShowOwnerPets.catList.filter(cat => cat.id !== petId);
-    }
-    else if (petType === PetTypes.Dog) {
-      updShowOwnerPets.dogList = updShowOwnerPets.dogList.filter(dog => dog.id !== petId);
-    }
-
-    this.setState({
-      showOwnerPets: updShowOwnerPets
-    });
+    // //update showOwnerPets modal state
+    // let updShowOwnerPets = JSON.parse(JSON.stringify(this.state.showOwnerPets));
+    // if (petType === PetTypes.Cat) {
+    //   updShowOwnerPets.catList = updShowOwnerPets.catList.filter(cat => cat.id !== petId);
+    // }
+    // else if (petType === PetTypes.Dog) {
+    //   updShowOwnerPets.dogList = updShowOwnerPets.dogList.filter(dog => dog.id !== petId);
+    // }
+    // this.setState({
+    //   showOwnerPets: updShowOwnerPets
+    // });
   }
 
   //pet owner modal closed
@@ -328,6 +335,7 @@ export default class App extends Component
 
   render()
   {
+    //get unassigned cats and dogs to render in sidebar
     let unassignedCatList = this.state.catList.filter((cat) =>
     {
       let ownerFound = this.state.ownerList.find(owner => owner.catIds.find(ownCatId => ownCatId === cat.id));
@@ -345,10 +353,34 @@ export default class App extends Component
       return false;
     });
 
+    //if the modal is open to show the owner pets, get the owner pets from the live list 
+    let modal_cats = [];
+    let modal_dogs = [];
+    let modal_ownerName = "";
+    if (this.state.showOwnerPets.open) {
+      let modal_owner = this.state.ownerList.find(owner => owner.id === this.state.showOwnerPets.ownerId);
+      modal_owner.catIds.forEach((catId) =>
+      {
+        let catFound = this.state.catList.find(cat => cat.id === catId);
+        if (catFound !== undefined) {
+          modal_cats.push(catFound);
+        }
+      });
+
+      modal_owner.dogIds.forEach((dogId) =>
+      {
+        let dogFound = this.state.dogList.find(dog => dog.id === dogId);
+        if (dogFound !== undefined) {
+          modal_dogs.push(dogFound);
+        }
+      });
+    }
+
+
     return (
       <main>
         <OwnerModal
-          open={this.state.showOwnerPets.open} ownerId={this.state.showOwnerPets.ownerId} ownerName={this.state.showOwnerPets.ownerName} catList={this.state.showOwnerPets.catList} dogList={this.state.showOwnerPets.dogList}
+          open={this.state.showOwnerPets.open} ownerId={this.state.showOwnerPets.ownerId} ownerName={modal_ownerName} catList={modal_cats} dogList={modal_dogs}
           onPetRename={this.onPetRename} onPetDelete={this.onPetDelete} onRemoveOwnerPet={this.onRemoveOwnerPet} onCloseModal={this.onCloseModal}
         />
         <ToastContainer closeOnClick />
