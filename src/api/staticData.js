@@ -1,5 +1,5 @@
 
-export default class AppData {
+export default class StaticData {
   static getData() {
     return {
       catList: [

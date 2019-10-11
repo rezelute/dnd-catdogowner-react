@@ -57,7 +57,7 @@ export default class OwnerPets extends Component
 
 //PropTypes
 OwnerPets.propTypes = {
-  ownerId: PropTypes.number.isRequired,
+  ownerId: PropTypes.string.isRequired,
   ownerName: PropTypes.string.isRequired,
   catList: PropTypes.array.isRequired,
   dogList: PropTypes.array.isRequired,
