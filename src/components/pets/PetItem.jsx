@@ -36,15 +36,18 @@ export default class PetItem extends Component
             onDrag={this.props.page === "sidebar" ? this.props.onDrag.bind(this, id, animal): ()=>{return false} }
           >
             <h3 className="pet-name">{name}</h3>
-            <div className="pet-attributes">
-              {
-                Object.entries(attributes).map(([key, value], index) =>
-                (
-                  <div key={index}><span>{key}:</span> {value}</div>
-                ))
-              }
+            <div>
+              <div className="pet-attributes">
+                {
+                  Object.entries(attributes).map(([key, value], index) =>
+                  (
+                    <div key={index}><span>{key}:</span> {value}</div>
+                  ))
+                }
+              </div>
+              <div className="pet-id">{id}</div>
             </div>
-            <span className="pet-id">{id}</span>
+            
           </div>
   
           {page === "owner" &&

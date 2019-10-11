@@ -15,7 +15,7 @@ export default class OwnerPets extends Component
 
   render()
   {
-    const { open, ownerId, ownerName, catList, dogList } = this.props;
+    const { ownerId, ownerName, catList, dogList } = this.props;
 
     return (
       <section id="owner-pets">
@@ -57,7 +57,6 @@ export default class OwnerPets extends Component
 
 //PropTypes
 OwnerPets.propTypes = {
-  open: PropTypes.bool.isRequired,
   ownerId: PropTypes.number.isRequired,
   ownerName: PropTypes.string.isRequired,
   catList: PropTypes.array.isRequired,

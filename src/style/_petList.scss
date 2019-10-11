@@ -28,6 +28,16 @@ ul.pet-list.owner{
 
     //remove owner from pet button
     .remove-owner-pet{
+      padding: 0.5em 0;
+
+      &:before{
+        padding-bottom: 0.5em;;
+        margin:0px auto;
+        content: "";
+        display:block;
+        width:70%;
+        border-top:1px solid rgba(31, 31, 31, 0.438);
+      }
       button{
         &:before{
           content: "";
@@ -52,7 +62,7 @@ ul.pet-list{
 //each pet item
 ul.pet-list > li > div{
   position: relative;
-  padding-bottom: 1em; //cater for absolute positioned id
+  //padding-bottom: 1em; //cater for absolute positioned id
   
   //show buttons on hover
   &:hover{
@@ -103,10 +113,18 @@ ul.pet-list > li > div{
     color: white;
   }
 
-  //pet attributes
-  .pet-attributes{
+  //padding inside content after header
+  .pet-name + div{
     padding: 0.5em;
 
+    //spacing between each content piece (attribute box and pet id)
+    > *:not(:last-child){
+      margin-bottom: 1em;
+    }
+  }
+
+  //pet attributes
+  .pet-attributes{
     //every property (color, breed etc)
     >*{
       margin-bottom: 0.6em;
@@ -124,10 +142,7 @@ ul.pet-list > li > div{
 
   //absolute pet id
   .pet-id{
-    position: absolute;
-    bottom: 0;
-    right: 0.2em;
-    margin:0;
+    text-align: right;
     font-size: 90%;
   }
 }

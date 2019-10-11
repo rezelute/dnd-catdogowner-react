@@ -32,8 +32,11 @@ export default class App extends Component
     },
     modal: {
       active: "", //ownerPets | createOwner | createPet | ""
-      ownerPets: {
+      ownerPets: { //modal options
         ownerId: "-1"
+      },
+      createPet: { //modal options
+        animal: ""
       }
     },
     // showOwnerPets: {
@@ -248,13 +251,27 @@ export default class App extends Component
     });
   }
 
-  openModal = (createType) => //createType = createOwner | createPet
+  //open modal to create a new pet
+  openModal_CreatePet = (animal) =>
   {
     this.setState({
       modal: {
-        active: createType
+        active: "createPet",
+        createPet: {
+          animal: animal
+        }
       }
     })
+  }
+
+  //open modal to create a new owner
+  openModal_CreateOwner = () =>
+  {
+    this.setState({
+      modal: {
+        active: "createOwner",
+      }
+    });
   }
   
   //show owner pets in a modal
@@ -334,20 +351,33 @@ export default class App extends Component
     let newPet = {
       id: UUID.v4(),
       name,
-      breed,
-      color
+      attributes: { breed, color }
     }
     
     if (animal === PetTypes.Cat) {
       this.setState({
-        catList: [...this.state.catList, newPet]
+        catList: [...this.state.catList, newPet],
+        modal: {
+          active: "",
+          createPet: {//reset
+            animal: ""
+          }
+        }
       })
     }
     else if (animal === PetTypes.Dog) {
       this.setState({
-        dogList: [...this.state.dogList, newPet]
+        dogList: [...this.state.dogList, newPet],
+        modal: {
+          active: "",
+          createPet: {//reset
+            animal: ""
+          }
+        }
       })
     }
+
+    this.createNotification("success", `New ${animal} with name '${name}' has been added to the ${animal}'s list`); 
   }
   
   //create new owner
@@ -430,7 +460,7 @@ export default class App extends Component
             <button className="modal-btn-close" onClick={this.onCloseModal}>Close Modal</button>
             
             {this.state.modal.active === "createPet" &&
-              <CreatePet onCreatePet={this.onCreatePet}/>
+              <CreatePet animal={this.state.modal.createPet.animal} onCreatePet={this.onCreatePet}/>
             }
 
             {this.state.modal.active === "createOwner" &&
@@ -439,7 +469,7 @@ export default class App extends Component
 
             {this.state.modal.active === "ownerPets" &&
               <OwnerPets
-              open={this.state.modal.active==="ownerPets"} ownerId={this.state.modal.ownerPets.ownerId} ownerName={modal_ownerName} catList={modal_cats} dogList={modal_dogs}
+              ownerId={this.state.modal.ownerPets.ownerId} ownerName={modal_ownerName} catList={modal_cats} dogList={modal_dogs}
               onPetRename={this.onPetRename} onPetDelete={this.onPetDelete} onRemoveOwnerPet={this.onRemoveOwnerPet} onCloseModal={this.onCloseModal}
               />
             }
@@ -448,7 +478,7 @@ export default class App extends Component
 
         <section id="sidebar-left">
           <div className="sidebar-controls">
-            <button onClick={this.openModal.bind(this, 'createPet')} className="add-new-pet cat" title="Add new pet"></button>
+            <button onClick={this.openModal_CreatePet.bind(this, 'cat')} className="add-new-pet cat" title="Add new pet"></button>
           </div>
           <h2>Cats</h2>
           <PetList page="sidebar" animal={PetTypes.Cat} list={unassignedCatList} onDrag={this.onDrag} onPetRename={this.onPetRename} onPetDelete={this.onPetDelete} />
@@ -456,7 +486,7 @@ export default class App extends Component
 
         <section id="pageArea">
           <div className="sidebar-controls">
-          <button onClick={this.openModal.bind(this, 'createOwner')} className="add-new-owner" title="Add new person"></button>
+          <button onClick={this.openModal_CreateOwner.bind(this)} className="add-new-owner" title="Add new person"></button>
           </div>
           <h2>Owners</h2>
           <OwnerList ownerList={this.state.ownerList} onDrop={this.onDrop} onOwnerRename={this.onOwnerRename} onOwnerDelete={this.onOwnerDelete} onShowOwnerPets={this.onShowOwnerPets} />
@@ -464,7 +494,7 @@ export default class App extends Component
 
         <section id="sidebar-right">
           <div className="sidebar-controls">
-            <button onClick={this.openModal.bind(this, 'createPet')} className="add-new-pet dog" title="Add new pet"></button>
+            <button onClick={this.openModal_CreatePet.bind(this, 'dog')} className="add-new-pet dog" title="Add new pet"></button>
           </div>
           <h2>Dogs</h2>
           <PetList page="sidebar" animal={PetTypes.Dog} list={unassignedDogList} onDrag={this.onDrag} onPetRename={this.onPetRename} onPetDelete={this.onPetDelete} />

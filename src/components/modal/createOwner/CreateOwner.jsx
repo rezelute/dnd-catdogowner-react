@@ -33,13 +33,13 @@ export default class CreateOwner extends Component
         <h2>Create a new owner</h2>
         
         <form action="">
-          <label htmlFor="ownerName">Owner name</label>
+          <label htmlFor="name">Owner name</label>
           <input type="text" name="name" value={this.state.name} placeholder="Enter owner name" onChange={this.handleChange} />
           
-          <label htmlFor="ownerName">Owner age</label>
+          <label htmlFor="age">Owner age</label>
           <input type="text" name="age" value={(this.state.age===0 ? "" : this.state.age)} placeholder="Enter owner age" onChange={this.handleChange} />
           
-          <label htmlFor="ownerName">Owner country</label>
+          <label htmlFor="country">Owner country</label>
           <input type="text" name="country" value={this.state.country} placeholder="Enter owner country" onChange={this.handleChange} />
 
           <input type="submit" onClick={this.onCreateOwner} value="Create new owner"/>
