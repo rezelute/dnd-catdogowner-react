@@ -1,6 +1,7 @@
 import axios from "axios"
 import * as ApiUrls from "./apiUrls"
 import * as DataGenerator from "../js/data-generator";
+import PetTypes from '../js/petTypes'
 
 //convert the returned JSON data into app usable format
 //cat data: {"id": 1, "name": "Felix", "owner": -1}
@@ -161,11 +162,12 @@ export default class ApiData
   //create owner
   static createOwner(name)
   {
-    axios.post(ApiUrls.OwnerUrl.getUpdate(),
+    let errorMsg = `Failed to create the new owner, error is: `;
+
+    return axios.post(ApiUrls.OwnerUrl.getCreate(),
       { //data
-        params: {
-          name
-        },
+        name,
+        pets:[] //testing (useless for LIVE)
       },
       { //config
         headers: {
@@ -173,13 +175,74 @@ export default class ApiData
         }
       }
     )
-      .then(function (response)
+      .then(function (resp)
       {
-        console.log(response);
+        if (resp.status === 201) { //success
+          return resp.data.id;
+        }
+        else {
+          let error_info = "Server error";
+          if (resp.status === 400 || resp.status === 409) {
+            error_info = resp.error;
+          }
+          else if (resp.status === 403) { //unauth
+            error_info = resp.error;
+          }
+
+          throw Error(errorMsg + error_info);
+        }
       })
-      .catch(function (error)
+      .catch(function (error) //something else went wrong (such as 404 accessing the URL)
       {
         console.log(error);
+        throw Error(errorMsg + error);
+      })
+  }
+
+  //create pet
+  static createPet(name, animal)
+  {
+    let errorMsg = `Failed to create the new ${animal}, error is: `;
+    let animalUrl = "";
+    if (animal === PetTypes.Cat) {
+      animalUrl = ApiUrls.CatUrl.getCreate()
+    }
+    else if (animal === PetTypes.Dog) {
+      animalUrl = ApiUrls.DogUrl.getCreate()
+    }
+
+    return axios.post(animalUrl,
+      { //data
+        name,
+        owner: -1 //testing (useless for LIVE)
+      },
+      { //config
+        headers: {
+          "x-api-key": this.authToken
+        }
+      }
+    )
+      .then(function (resp)
+      {
+        if (resp.status === 201) { //success
+          return resp.data.id;
+        }
+        else { //error
+          let error_info = "Server error";
+          if (resp.status === 400 || resp.status === 409) {
+            error_info = resp.error;
+          }
+          else if (resp.status === 403) { //unauth
+            error_info = resp.error;
+          }
+
+          throw Error(errorMsg + error_info);
+        }
+      })
+      .catch(function (error) //something else went wrong (such as 404 accessing the URL)
+      {
+        console.log(error);
+        throw Error(errorMsg + error);
       })
   }
 }

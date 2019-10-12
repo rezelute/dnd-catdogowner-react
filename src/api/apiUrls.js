@@ -14,6 +14,11 @@ export class CatUrl
     return "http://localhost:3004/cats";
   }
 
+  static getCreate()
+  {
+    return this.getBase();
+  }
+
   static getUpdate(id)
   {
     return this.getBase() + "/" + id;
@@ -29,6 +34,11 @@ export class DogUrl
 {
   static getBase() {
     return "http://localhost:3004/dogs";
+  }
+
+  static getCreate()
+  {
+    return this.getBase();
   }
 
   static getUpdate(id)
@@ -48,6 +58,11 @@ export class OwnerUrl
     return "http://localhost:3004/owners";
   }
 
+  static getCreate()
+  {
+    return this.getBase();
+  }
+  
   static getUpdate(id)
   {
     return this.getBase() + "/" + id;
