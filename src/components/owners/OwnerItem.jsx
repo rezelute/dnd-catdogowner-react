@@ -50,7 +50,7 @@ export default class OwnerItem extends Component
 
   render()
   {
-    const { id, name, country, age, catIds, dogIds } = this.props;
+    const { id, name, attributes, catIds, dogIds } = this.props;
 
     return (
       <li>
@@ -58,8 +58,15 @@ export default class OwnerItem extends Component
           
           <div className="owner-attributes">
             <h3 className="owner-name">{name}</h3>
-            <div><span className="label">Age:</span> {age}</div>
-            <div><span className="label">Country:</span> {country}</div>
+
+            <div className="owner-attributes">
+              {
+                Object.entries(attributes).map(([key, value], index) =>
+                (
+                  <div key={index}><span className="label">{key}:</span> {value}</div>
+                ))
+              }
+            </div>
           </div>
 
           <div className="owner-pets-count">
@@ -81,10 +88,9 @@ export default class OwnerItem extends Component
 
 //PropTypes
 OwnerItem.propTypes = {
-  id: PropTypes.string.isRequired,
+  id: PropTypes.number.isRequired,
   name: PropTypes.string.isRequired,
-  age: PropTypes.number.isRequired,
-  country: PropTypes.string.isRequired,
+  attributes: PropTypes.object.isRequired, //{age: <string>, country: <string>}
   catIds: PropTypes.array.isRequired,
   dogIds: PropTypes.array.isRequired,
 

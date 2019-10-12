@@ -11,7 +11,7 @@ export class CatUrl
 {
   static getBase()
   {
-    return "http://localhost:3004/catList";
+    return "http://localhost:3004/cats";
   }
 
   static getUpdate(id)
@@ -28,7 +28,7 @@ export class CatUrl
 export class DogUrl
 {
   static getBase() {
-    return "http://localhost:3004/dogList";
+    return "http://localhost:3004/dogs";
   }
 
   static getUpdate(id)
@@ -45,7 +45,7 @@ export class DogUrl
 export class OwnerUrl
 {
   static getBase() {
-    return "http://localhost:3004/ownerList";
+    return "http://localhost:3004/owners";
   }
 
   static getUpdate(id)

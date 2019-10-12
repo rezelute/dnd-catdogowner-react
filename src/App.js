@@ -19,12 +19,9 @@ import './style/app.scss'
 export default class App extends Component
 {
   state = {
-    userAccount: {
-      authToken: ""
-    },
     catList: [], //{ id: "0", name: "", attributes: { breed: "", color: "" } },
     dogList: [], //{ id: "0", name: "", attributes: { breed: "", color: "" } },
-    ownerList: [], //{ id: "0", name: "", age: -1, country: "", catIds: [], dogIds: [] },
+    ownerList: [], //{ id: "0", name: "", attributes: {age: -1, country: ""} , catIds: [], dogIds: [] },
     draggedItem: {
       petId: "-1",
       petType: ""
@@ -59,20 +56,17 @@ export default class App extends Component
         this.setState({
           catList: data.catList,
           dogList: data.dogList,
-          ownerList: data.ownerList,
-          userAccount: { //set auth token in state
-            authToken
-          }
+          ownerList: data.ownerList
         });
       })
       .catch((error) => //handle data load retrieval error
       {
-        alert(error);
+        console.log("data load error - " + error);
       });
     })
     .catch((error) => //handle user login error
     {
-      alert(error);
+      alert("User login error - " + error);
     });
   
      //STATIC API
