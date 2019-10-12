@@ -1,5 +1,5 @@
 
-export class UserUrl
+export class UserApiUrl
 {
   static getLogin()
   {
@@ -7,7 +7,7 @@ export class UserUrl
   }
 }
 
-export class CatUrl
+export class CatApiUrl
 {
   static getBase()
   {
@@ -30,7 +30,7 @@ export class CatUrl
   }
 }
 
-export class DogUrl
+export class DogApiUrl
 {
   static getBase() {
     return "http://localhost:3004/dogs";
@@ -52,7 +52,7 @@ export class DogUrl
   }
 }
 
-export class OwnerUrl
+export class OwnerApiUrl
 {
   static getBase() {
     return "http://localhost:3004/owners";

@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { ToastContainer, toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.min.css'
+import LoadingOverlay from 'react-loading-overlay';
 
 import PetList from "./components/pets/PetList"
 import OwnerPets from "./components/modal/ownerPets/OwnerPets"
@@ -8,8 +9,11 @@ import OwnerList from "./components/owners/OwnerList"
 import CreatePet from "./components/modal/createPet/CreatePet"
 import CreateOwner from "./components/modal/createOwner/CreateOwner"
 
-//import AppData from "./js/appData"
-import ApiData from "./api/apiData"
+import ApiAuth from "./api/auth-api"
+import * as ApiPage from "./api/page-api"
+import * as ApiOwner from "./api/owner-api"
+import * as ApiPet from "./api/pet-api"
+
 import PetTypes from './js/petTypes'
 //import UUID from 'uuid'
 
@@ -19,6 +23,7 @@ import './style/app.scss'
 export default class App extends Component
 {
   state = {
+    showLoadingOverlay: false, //overlay when stuff is loading
     catList: [], //{ id: "0", name: "", attributes: { breed: "", color: "" } },
     dogList: [], //{ id: "0", name: "", attributes: { breed: "", color: "" } },
     ownerList: [], //{ id: "0", name: "", attributes: {age: -1, country: ""} , catIds: [], dogIds: [] },
@@ -47,11 +52,11 @@ export default class App extends Component
   componentDidMount()
   {
     //first log user in 
-    ApiData.getAuthData()
+    ApiAuth.setAuthData()
     .then((authToken) =>
     {
       //load page data
-      ApiData.getPageData()
+      ApiPage.getPageData()
       .then((data) =>
       {
         this.setState({
@@ -77,6 +82,13 @@ export default class App extends Component
     //   dogList: data.dogList,
     //   ownerList: data.ownerList
     // });
+  }
+
+  showLoadingOverlay = (show) =>
+  {
+    this.setState({
+      showLoadingOverlay: show
+    })
   }
 
   //create notifications
@@ -251,10 +263,26 @@ export default class App extends Component
   //handle owner deletions
   onOwnerDelete = (delOwnerId) =>
   {
-    this.setState({
-      ownerList: this.state.ownerList.filter(owner => owner.id !== delOwnerId)
+    this.showLoadingOverlay(true);
+
+    ApiOwner.deleteOwner(delOwnerId)
+    .then((deletedId) =>
+    {
+      //update state
+      this.setState({
+        ownerList: this.state.ownerList.filter(owner => owner.id !== delOwnerId)
+      });
+
+      this.createNotification("success", `Owner of ID '${delOwnerId}' has been deleted`);
+      this.showLoadingOverlay(false);
+    })
+    .catch((error) =>
+    {
+      this.createNotification("error", error);
+      this.showLoadingOverlay(false);
     });
   }
+
   //handle owner rename
   onOwnerRename = (ownerId, newName) =>
   {
@@ -369,7 +397,9 @@ export default class App extends Component
   //create new pet
   onCreatePet = (animal, name, breed, color) =>
   {
-    ApiData.createPet(name, animal)
+    this.showLoadingOverlay(true);
+
+    ApiPet.createPet(name, animal)
     .then((newPetId) =>
     {
       let newPet = {
@@ -402,17 +432,21 @@ export default class App extends Component
       }
   
       this.createNotification("success", `New ${animal} with name '${name}' has been added to the ${animal}'s list`);
+      this.showLoadingOverlay(false);
     })
     .catch((error) =>
     {
       this.createNotification("error", error);
+      this.showLoadingOverlay(false);
     });
   }
 
   //create new owner
   onCreateOwner = (name, country, age) =>
   {
-    ApiData.createOwner(name)
+    this.showLoadingOverlay(true);
+
+    ApiOwner.createOwner(name)
     .then((newOwnerId) =>
     {
       let newOwner = {
@@ -435,10 +469,12 @@ export default class App extends Component
       });
 
       this.createNotification("success", `New owner '${name}' has been added to the owners list`);
+      this.showLoadingOverlay(false);
     })
     .catch((error) =>
     {
       this.createNotification("error", error);
+      this.showLoadingOverlay(false);
     });
   }
 
@@ -538,6 +574,7 @@ export default class App extends Component
         </section>
 
         <ToastContainer closeOnClick />
+        <LoadingOverlay active={this.state.showLoadingOverlay} spinner text='Loading ...'></LoadingOverlay>
       </main>
     );
   }
