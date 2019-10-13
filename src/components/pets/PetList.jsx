@@ -11,7 +11,7 @@ export default class PetList extends Component {
       {
         this.props.list.map((pet, index) => (
           <PetItem
-            animal={this.props.animal} id={pet.id} name={pet.name} attributes={pet.attributes} page={this.props.page} key={pet.id}
+            animal={this.props.animal} ownerId={pet.ownerId} id={pet.id} name={pet.name} attributes={pet.attributes} page={this.props.page} key={pet.id}
             onDrag={this.props.onDrag}
             onPetRename={this.props.onPetRename} onPetDelete={this.props.onPetDelete}
             onRemoveOwnerPet={this.props.onRemoveOwnerPet}

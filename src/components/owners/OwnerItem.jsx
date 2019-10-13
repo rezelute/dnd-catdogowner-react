@@ -42,7 +42,7 @@ export default class OwnerItem extends Component
 
   promptNewOwnerName = (ownerId, oldName) =>
   {
-    var newName = prompt(`Please enter a new name for '${oldName}'`, "");
+    var newName = prompt(`Please enter a new name for owner: '${oldName}'`, "");
     if (newName != null) {
       this.props.onOwnerRename(ownerId, newName);
     }
@@ -56,6 +56,12 @@ export default class OwnerItem extends Component
       <li>
         <div className={(this.state.isDragOver ? "dragOver" : "")} onDrop={this.onDrop.bind(this,id)} onDragOver={this.onDragOver} onDragLeave={this.onDragLeave}>
           
+          <div className="owner-buttons invisible">
+            <button className="info" title="click for more owner information"></button>
+            <button className="rename" title="rename owner" onClick={this.promptNewOwnerName.bind(this, id, name)}></button>
+            <button className="delete" title="delete owner" onClick={this.props.onOwnerDelete.bind(this, id)}></button>
+          </div>
+
           <div className="owner-attributes">
             <h3 className="owner-name">{name}</h3>
 

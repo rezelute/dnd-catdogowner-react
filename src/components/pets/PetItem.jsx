@@ -20,17 +20,17 @@ export default class PetItem extends Component
 
   render()
   {
-    const { id, animal, name, attributes, page } = this.props;
+    const { id, animal, ownerId, name, attributes, page } = this.props;
 
     return (
-      <li>
+      <li data-owner-id={ownerId} data-pet-id={id}>
         <div>
           <div className="pet-buttons invisible">
             <button className="info" title="click for more pet information"></button>
             <button className="rename" title="rename pet" onClick={this.promptNewPetName.bind(this, id, name)}></button>
             <button className="delete" title="delete pet" onClick={this.props.onPetDelete.bind(this, id, animal)}></button>
           </div>
-  
+
           <div className="pet-draggable"
             draggable={this.props.page === "sidebar" ? true : false}
             onDrag={this.props.page === "sidebar" ? this.props.onDrag.bind(this, id, animal): ()=>{return false} }
@@ -66,6 +66,7 @@ export default class PetItem extends Component
 PetItem.propTypes = {
   page: PropTypes.string.isRequired,
   id: PropTypes.number.isRequired,
+  ownerId: PropTypes.number,
   animal: PropTypes.string.isRequired, //is cat, dog etc.
   name: PropTypes.string.isRequired,
   attributes: PropTypes.object.isRequired, //breed, colour, etc

@@ -73,12 +73,12 @@ export class OwnerApiUrl
     return this.getBase() + "/" + id;
   }
 
-  static allocatePet(id, petId)
+  static getAllocatePet(id, petId)
   {
     return this.getBase() + "/" + id + "/pet/" + petId;
   }
 
-  static unAllocatePet(id, petId)
+  static getUnAllocatePet(id, petId)
   {
     return this.getBase() + "/" + id + "/pet/" + petId;
   }

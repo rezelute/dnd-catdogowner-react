@@ -13,7 +13,7 @@ export default class CreatePet extends Component
     };
 
     this.handleChange = this.handleChange.bind(this);
-    this.onCreatePet = this.onCreatePet.bind(this);
+    this.onPetCreate = this.onPetCreate.bind(this);
   }
 
 
@@ -22,10 +22,10 @@ export default class CreatePet extends Component
     this.setState({[event.target.name]: event.target.value});
   }
 
-  onCreatePet = (event) =>
+  onPetCreate = (event) =>
   {
     event.preventDefault();
-    this.props.onCreatePet(this.state.animal, this.state.name, this.state.breed, this.state.color);
+    this.props.onPetCreate(this.state.animal, this.state.name, this.state.breed, this.state.color);
   }
 
   render() {
@@ -49,7 +49,7 @@ export default class CreatePet extends Component
           <label htmlFor="color">Pet color</label>
           <input type="text" name="color" value={this.state.color} placeholder="Enter pet color" onChange={this.handleChange} />
 
-          <input type="submit" onClick={this.onCreatePet} value="Create new pet"/>
+          <input type="submit" onClick={this.onPetCreate} value="Create new pet"/>
         </form>
       </section>
     )
@@ -58,5 +58,5 @@ export default class CreatePet extends Component
 
 CreatePet.propTypes = {
   animal: PropTypes.string.isRequired,
-  onCreatePet: PropTypes.func.isRequired,
+  onPetCreate: PropTypes.func.isRequired,
 }

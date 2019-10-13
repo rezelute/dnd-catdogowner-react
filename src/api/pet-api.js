@@ -8,7 +8,7 @@ import { GenerateCatAttr, GenerateDogAttr } from "../js/data-generator";
 //convert the returned JSON data into app usable format
 //cat data: {"id": 1, "name": "Felix", "owner": -1}
 //cat app data: { id: 0, name: "", attributes: { breed: "", color: "" } },
-function formatCats(api_cats)
+export function formatCats(api_cats)
 {
   return api_cats.map(api_cats =>
   {
@@ -16,6 +16,7 @@ function formatCats(api_cats)
     return {
       id,
       name,
+      ownerId: api_cats.owner,
       attributes: {
         breed: GenerateCatAttr.getBreed(),
         color: GenerateCatAttr.getColor(),
@@ -25,7 +26,7 @@ function formatCats(api_cats)
 }
 //dog data: {"id": 1, "name": "Felix", "owner": -1}
 //dog app data: { id: 0, name: "", attributes: { breed: "", color: "" } },
-function formatDogs(api_dogs)
+export function formatDogs(api_dogs)
 {
   return api_dogs.map(api_dog =>
   {
@@ -33,6 +34,7 @@ function formatDogs(api_dogs)
     return {
       id,
       name,
+      ownerId: api_dog.owner,
       attributes: {
         breed: GenerateDogAttr.getBreed(),
         color: GenerateDogAttr.getColor(),
@@ -41,8 +43,10 @@ function formatDogs(api_dogs)
   });
 }
 
-//get all cats
-export function getCats()
+/** no forma
+ * @param {*} noFormat 
+ */
+export function getCats(formatData=true)
 {
   return axios.get(CatApiUrl.getBase(), {
     headers: {
@@ -52,18 +56,25 @@ export function getCats()
     .then((resp)=>
     {
       if (resp.status === 200) { //success
-        return {
-          catList: formatCats(resp.data)
-        };
+        if (!formatData) {
+          return resp.data; //send back unformatted data (data in api format)
+        }
+        else { //format data and return
+          return formatCats(resp.data);
+        }
       }
       else { //error code
-        throw Error(`Error retrieving cats data - status: ${resp.status}, error: ${resp.data.error}`);
+        throw Error(`status: ${resp.status}, message: ${resp.data.error}`);
       }
+    })
+    .catch(error => //catches 404 not found and above errors
+    {
+      throw Error("Failed to retrieve cats data - Error info: " + error.message);
     })
 }
 
 //get all dogs
-export function getDogs()
+export function getDogs(formatData=true)
 {
   return axios.get(DogApiUrl.getBase(), {
     headers: {
@@ -73,13 +84,20 @@ export function getDogs()
     .then((resp)=>
     {
       if (resp.status === 200) { //success
-        return {
-          dogList: formatDogs(resp.data)
-        };
+        if (!formatData) { //send back unformatted data (data in api format)
+          return resp.data;
+        }
+        else { //format data and return
+          return formatDogs(resp.data);
+        }
       }
       else { //error code
-        throw Error(`Error retrieving dogs data - status: ${resp.status}, error: ${resp.data.error}`);
+        throw Error(`status: ${resp.status}, error: ${resp.data.error}`);
       }
+    })
+    .catch(error => //catches 404 not found and above errors
+    {
+      throw Error("Failed to retrieve dogs data - Error info: " + error.message);
     })
 }
 
@@ -120,12 +138,118 @@ export function createPet(name, animal)
           error_info = resp.error;
         }
 
+        throw Error(error_info);
+      }
+    })
+    .catch(function (respError) //error from THEN block or 404 page not found
+    {
+      throw Error(errorMsg + respError.message);
+    })
+}
+
+
+//deletes a pet
+export function deletePet(id, animal)
+{
+  let errorMsg = `Failed to delete the pet, error is: `;
+
+  let petApiUrl="";
+  if (animal === PetTypes.Cat) {
+    petApiUrl = CatApiUrl.getDelete(id)
+  }
+  else if (animal === PetTypes.Dog) {
+    petApiUrl = DogApiUrl.getDelete(id)
+  }
+
+  return axios.delete( petApiUrl+"penis",
+    null,
+    { //config
+      headers: {
+        "x-api-key": authToken
+      }
+    }
+  )
+    // .catch(function (respError) //404 - could be page not found or pet not found
+    // {
+    //   console.log("respError", respError.response.data);
+    //   if (respError !== undefined && respError.response !== undefined && respError.response.data.error !== undefined) { //pet was not found in the DB to be deleted, just delete from the state list
+    //     console.log("Pet was not found in DB, delete anyway");
+    //     return {
+    //       status: 200
+    //     }
+    //   }
+    //   else { //404 page not found
+    //     throw Error(errorMsg + "Page not found");
+    //   }
+    // })
+    .then(function (resp)
+    {
+      if (resp.status === 201 || resp.status === 200) { //success, response is null
+        return id;
+      }
+      else {
+        let error_info = "Server error"; //default error
+        if (resp.status === 403) { //unauth
+          error_info = resp.error;
+        }
+
         throw Error(errorMsg + error_info);
       }
     })
-    .catch(function (error) //something else went wrong (such as 404 accessing the URL)
+    .catch(function (respError) //error from THEN block OR 404 page not found error OR pet not found
     {
-      console.log(error);
-      throw Error(errorMsg + error);
+      throw Error(errorMsg + respError.message);
+    })
+}
+
+//renames a pet
+export function renamePet(id, newName, animal, ownerId)
+{
+  let errorMsg = `Failed to rename the pet, error is: `;
+
+  let petApiUrl="";
+  if (animal === PetTypes.Cat) {
+    petApiUrl = CatApiUrl.getUpdate(id)
+  }
+  else if (animal === PetTypes.Dog) {
+    petApiUrl = DogApiUrl.getUpdate(id)
+  }
+
+  return axios.put(petApiUrl,
+    { //data
+      name: newName,
+      owner: ownerId //testing for json-server (useless for LIVE)
+    },
+    { //config
+      headers: {
+        "x-api-key": authToken
+      }
+    }
+  )
+    .then(function (resp)
+    {
+      if (resp.status === 201 || resp.status === 200) { //success, response is null
+        return newName;
+      }
+      else {
+        let error_info = "Server error"; //default error (such as 404)
+        if (resp.status === 400 || resp.status === 409) {//400="Names must be alphanumeric", 409="Name exists"
+          error_info = resp.error;
+        }
+        else if (resp.status === 403) { //unauth
+          error_info = resp.error;
+        }
+
+        throw Error(error_info);
+      }
+    })
+    .catch(function (respError) //error from THEN block or page not found or owner not found
+    {
+      if (respError.data !== undefined && respError.data.error !== undefined) { //pet not found
+        throw Error("Pet was not found in DB to be renamed");
+      }
+      else { //One of the errors above OR 404 page not found
+        throw Error(errorMsg + respError.message);
+      }
     })
 }

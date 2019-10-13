@@ -5,7 +5,7 @@ export let authToken = ""; //authentication token
 
 
 //gets the user authentication token to verify login
-export default function setAuthData()
+export function setAuthData()
 {
   return axios.post(UserApiUrl.getLogin(), {
     params: {

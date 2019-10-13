@@ -9,7 +9,7 @@ import OwnerList from "./components/owners/OwnerList"
 import CreatePet from "./components/modal/createPet/CreatePet"
 import CreateOwner from "./components/modal/createOwner/CreateOwner"
 
-import ApiAuth from "./api/auth-api"
+import * as ApiAuth from "./api/auth-api"
 import * as ApiPage from "./api/page-api"
 import * as ApiOwner from "./api/owner-api"
 import * as ApiPet from "./api/pet-api"
@@ -24,9 +24,9 @@ export default class App extends Component
 {
   state = {
     showLoadingOverlay: false, //overlay when stuff is loading
-    catList: [], //{ id: "0", name: "", attributes: { breed: "", color: "" } },
-    dogList: [], //{ id: "0", name: "", attributes: { breed: "", color: "" } },
-    ownerList: [], //{ id: "0", name: "", attributes: {age: -1, country: ""} , catIds: [], dogIds: [] },
+    catList: [], //{ id: 0, name: "", ownerId: 1, attributes: { breed: "", color: "" } },
+    dogList: [], //{ id: 0, name: "", ownerId: 1, attributes: { breed: "", color: "" } },
+    ownerList: [], //{ id: 0, name: "", attributes: {age: -1, country: ""} , catIds: [], dogIds: [] },
     draggedItem: {
       petId: "-1",
       animal: ""
@@ -67,7 +67,7 @@ export default class App extends Component
       })
       .catch((error) => //handle data load retrieval error
       {
-        console.log("data load error - " + error);
+        console.log("Data load error - " + error.message);
       });
     })
     .catch((error) => //handle user login error
@@ -83,6 +83,7 @@ export default class App extends Component
     //   ownerList: data.ownerList
     // });
   }
+
 
   showLoadingOverlay = (show) =>
   {
@@ -111,7 +112,6 @@ export default class App extends Component
         });
         break;
       case 'error':
-        console.log("here i am");
         toast.error(message, {
           position: toast.POSITION.BOTTOM_CENTER
         });
@@ -135,81 +135,170 @@ export default class App extends Component
   }
 
   //on drop in one of the owners > assign the pet to the owner
-  onDrop = (droppedOwnerId) =>
+  onDrop = (ownerId) =>
   {
+    //another method
+    //var data = event.dataTransfer.getData("text"); //console.log("Data id is: ", data);
     const { petId, animal } = JSON.parse(JSON.stringify(this.state.draggedItem));
-
-    //another method (firefox likes this)
-    //var data = event.dataTransfer.getData("text");
-    //console.log("Data id is: ", data);
-    //const { id, draggedTask, todos } = this.state;
-
     console.log("Pet dropped - ID: ", petId, " Animal: ", animal);
-    console.log("Dropped on owner ID: ", droppedOwnerId);
+    console.log("Dropped on owner ID: ", ownerId);
 
-    //assign pet to owner
-    let updOwners = [...this.state.ownerList];
-    let updOwner = updOwners.find(owner => owner.id === droppedOwnerId);
-    if (updOwner === undefined) {
-      this.createNotification("error", `Could not find Owner to update, Owner ID: ${droppedOwnerId}`);
-      return;
-    }
+    this.showLoadingOverlay(true);
+
+    //find owner item to be updated
+    let updOwnerList = [...this.state.ownerList];
+    let updOwner = updOwnerList.find(owner => owner.id === ownerId);
+
+    //find pet item to be updated
+    let updPetList;
+    let updPet;
     if (animal === PetTypes.Cat) {
-      updOwner.catIds.push(petId);
+      updPetList = [...this.state.catList];
+      updPet = updPetList.find(cat => cat.id === petId);
     }
     else if (animal === PetTypes.Dog) {
-      updOwner.dogIds.push(petId);
+      updPetList = [...this.state.dogList];
+      updPet = updPetList.find(dog => dog.id === petId);
     }
 
-    console.log("updOwners is now: ", updOwners);
 
-    //update owner state
-    this.setState({
-      ownerList: updOwners
+    if (updOwner !== undefined && updPet !== undefined) {
+      ApiOwner.allocatePet(petId, animal, ownerId)
+      .then((resp_petId, resp_ownerId) =>
+      {
+        //assign petid to the owner cat/dog ids list
+        if (animal === PetTypes.Cat) {
+          updOwner.catIds.push(petId);
+        }
+        else if (animal === PetTypes.Dog) {
+          updOwner.dogIds.push(petId);
+        }
+        //update owner state
+        this.setState({
+          ownerList: updOwnerList
+        });
+
+        //assign ownerid to pet list
+        updPet.ownerId = ownerId;
+        if (animal === PetTypes.Cat) {
+          this.setState({
+            catList: updPetList
+          });
+        }
+        else if (animal === PetTypes.Dog) {
+          this.setState({
+            dogList: updPetList
+          });
+        }
+
+        this.createNotification("success", `Owner ${updOwner.name} has been allocated ${animal} '${updPet.name}'`);
+        this.showLoadingOverlay(false);
+      })
+      .catch((error) =>
+      {
+        this.createNotification("error", error.message);
+        this.showLoadingOverlay(false);
+      });
+    }
+  }
+
+  //create new pet
+  onPetCreate = (animal, name, breed, color) =>
+  {
+    this.showLoadingOverlay(true);
+
+    ApiPet.createPet(name, animal)
+    .then((newPetId) =>
+    {
+      let newPet = {
+        id: newPetId, //UUID.v4()
+        name,
+        ownerId: -1,
+        attributes: { breed, color }
+      }
+
+      if (animal === PetTypes.Cat) {
+        this.setState({
+          catList: [...this.state.catList, newPet],
+          modal: {
+            active: "",
+            createPet: {//reset
+              animal: ""
+            }
+          }
+        })
+      }
+      else if (animal === PetTypes.Dog) {
+        this.setState({
+          dogList: [...this.state.dogList, newPet],
+          modal: {
+            active: "",
+            createPet: {//reset
+              animal: ""
+            }
+          }
+        })
+      }
+  
+      this.createNotification("success", `New ${animal} with name '${name}' has been added to the ${animal}'s list`);
+      this.showLoadingOverlay(false);
+    })
+    .catch((error) =>
+    {
+      this.createNotification("error", error);
+      this.showLoadingOverlay(false);
     });
-
-
-    //set the hasOwner on the pet to true
-    let updCat, updDog;
-    if (animal === PetTypes.Cat) {
-      let updCatList = [...this.state.catList];
-      updCat = updCatList.find(cat => cat.id === petId);
-      if (updCat === undefined) {
-        this.createNotification("error", `Could not find Cat to update, Cat ID: ${petId}`);
-        return;
-      }
-      updCat.hasOwner = true;
-
-      //update state
-      this.setState({
-        catList: updCatList
-      });
-
-      this.createNotification("success", `Owner ${updOwner.name} has been allocated ${animal} '${updCat.name}'`);
-    }
-    else if (animal === PetTypes.Dog) {
-      let updDogList = [...this.state.dogList];
-      updDog = updDogList.find(dog => dog.id === petId);
-      if (updDog === undefined) {
-        this.createNotification("error", `Could not find Dog to update, Dog ID: ${petId}`);
-        return;
-      }
-
-      updDog.hasOwner = true;
-
-      //update state
-      this.setState({
-        dogList: updDogList
-      });
-
-      this.createNotification("success", `Owner ${updOwner.name} has been allocated ${animal} '${updDog.name}'`);
-    }
   }
 
   //handles pet renames
   onPetRename = (petId, animal, newName) =>
   {
-    console.log("Pet name change - ID: ", petId, ", animal: ", animal, ", new name: ", newName);
+    this.showLoadingOverlay(true);
+
+    console.log("Pet name to change - ID: ", petId, ", animal: ", animal, ", new name: ", newName);
+
+    //find pet item to be updated
+    let updPetList;
+    let updPet;
+    if (animal === PetTypes.Cat) {
+      updPetList = [...this.state.catList];
+      updPet = updPetList.find(cat => cat.id === petId);
+    }
+    else if (animal === PetTypes.Dog) {
+      updPetList = [...this.state.dogList];
+      updPet = updPetList.find(dog => dog.id === petId);
+    }
+
+    if (updPet !== undefined) {
+      ApiPet.renamePet(petId, newName, animal, updPet.ownerId)
+      .then((resp_newName) =>
+      {
+        let oldPetName = updPet.name;
+        updPet.name = resp_newName; //update new name for state
+
+        //update state
+        if (animal === PetTypes.Cat) {
+          this.setState({
+            catList: updPetList
+          });
+        }
+        else if (animal === PetTypes.Dog) {
+          this.setState({
+            dogList: updPetList
+          });
+        }
+
+        this.createNotification("success", `Pet '${oldPetName}' has been renamed to: '${resp_newName}'`);
+        this.showLoadingOverlay(false);
+      })
+      .catch((error) =>
+      {
+        this.createNotification("error", error.message);
+        this.showLoadingOverlay(false);
+      });
+    }
+
+    
 
     if (animal === PetTypes.Cat) {
       let updList = [...this.state.catList];
@@ -242,38 +331,85 @@ export default class App extends Component
   }
 
   //handles pet deletions
-  onPetDelete = (delPetId, delAnimal) =>
-  {
-    //console.log("Pet delete - ID: ", delPetId, ", animal: ", delAnimal);
-
-    if (delAnimal === PetTypes.Cat) {
-      //update state
-      this.setState({
-        catList: this.state.catList.filter(cat => cat.id !== delPetId)
-      });
-    }
-    else if (delAnimal === PetTypes.Dog) {
-      //update state
-      this.setState({
-        dogList: this.state.dogList.filter(dog => dog.id !== delPetId)
-      });
-    }
-  }
-
-  //handle owner deletions
-  onOwnerDelete = (delOwnerId) =>
+  onPetDelete = (delPetId, animal) =>
   {
     this.showLoadingOverlay(true);
 
-    ApiOwner.deleteOwner(delOwnerId)
-    .then((deletedId) =>
+    let updPetList;
+    let updPet;
+    if (animal === PetTypes.Cat) {
+      updPetList = [...this.state.catList];
+      updPet = updPetList.find(cat => cat.id === delPetId);
+    }
+    else if (animal === PetTypes.Dog) {
+      updPetList = [...this.state.dogList];
+      updPet = updPetList.find(dog => dog.id === delPetId);
+    }
+
+    if (updPet !== undefined) {
+      ApiPet.deletePet(delPetId, animal)
+      .then((deletedId) =>
+      {
+        const delPetName = updPet.name;
+        
+        //update state
+        if (animal === PetTypes.Cat) {
+          //update state
+          this.setState({
+            catList: this.state.catList.filter(cat => cat.id !== delPetId)
+          });
+        }
+        else if (animal === PetTypes.Dog) {
+          //update state
+          this.setState({
+            dogList: this.state.dogList.filter(dog => dog.id !== delPetId)
+          });
+        }
+  
+        this.createNotification("success", `Pet '${delPetName}' (id: ${deletedId}) has been deleted`);
+        this.showLoadingOverlay(false);
+      })
+      .catch((error) =>
+      {
+        this.createNotification("error", error.message);
+        this.showLoadingOverlay(false);
+      });
+    }
+
+
+    //console.log("Pet delete - ID: ", delPetId, ", animal: ", delAnimal);
+
+    
+  }
+
+  //create new owner
+  onCreateOwner = (name, country, age) =>
+  {
+    this.showLoadingOverlay(true);
+
+    ApiOwner.createOwner(name)
+    .then((newOwnerId) =>
     {
-      //update state
+      let newOwner = {
+        id: newOwnerId,
+        name,
+        attributes: {
+          country,
+          age
+        },
+        catIds: [],
+        dogIds: []
+      }
+  
+      //update owners list and close modal
       this.setState({
-        ownerList: this.state.ownerList.filter(owner => owner.id !== delOwnerId)
+        ownerList: [...this.state.ownerList, newOwner],
+        modal: {
+          active: ""
+        }
       });
 
-      this.createNotification("success", `Owner of ID '${delOwnerId}' has been deleted`);
+      this.createNotification("success", `New owner '${name}' has been added to the owners list`);
       this.showLoadingOverlay(false);
     })
     .catch((error) =>
@@ -283,21 +419,63 @@ export default class App extends Component
     });
   }
 
+  //handle owner deletions
+  onOwnerDelete = (delOwnerId) =>
+  {
+    this.showLoadingOverlay(true);
+
+    let owner = this.state.ownerList.find(owner => owner.id === delOwnerId);
+    if (owner !== undefined) {
+      ApiOwner.deleteOwner(delOwnerId)
+      .then((deletedId) =>
+      {
+        const delOwnerName = owner.name;
+
+        //update state
+        this.setState({
+          ownerList: this.state.ownerList.filter(owner => owner.id !== delOwnerId)
+        });
+  
+        this.createNotification("success", `Owner '${delOwnerName}' (id: ${deletedId}) has been deleted`);
+        this.showLoadingOverlay(false);
+      })
+      .catch((error) =>
+      {
+        this.createNotification("error", error.message);
+        this.showLoadingOverlay(false);
+      });
+    }
+  }
+
   //handle owner rename
   onOwnerRename = (ownerId, newName) =>
   {
+    this.showLoadingOverlay(true);
+
     let updList = [...this.state.ownerList];
     let updOwner = updList.find(owner => owner.id === ownerId);
-    if (updOwner === undefined) {
-      this.createNotification("error", `Could not find Owner to rename, Owner ID: ${ownerId}`);
-      return;
-    }
-    updOwner.name = newName;
 
-    //update state
-    this.setState({
-      ownerList: updList
-    });
+    if (updOwner !== undefined) {
+      ApiOwner.renameOwner(ownerId, newName, updOwner.catIds, updOwner.dogIds)
+      .then((resp_newName) =>
+      {
+        let oldOwnerName = updOwner.name;
+        updOwner.name = resp_newName; //update new name for state
+
+        //update state
+        this.setState({
+          ownerList: updList
+        });
+
+        this.createNotification("success", `Owner '${oldOwnerName}' has been renamed to: '${resp_newName}'`);
+        this.showLoadingOverlay(false);
+      })
+      .catch((error) =>
+      {
+        this.createNotification("error", error.message);
+        this.showLoadingOverlay(false);
+      });
+    }
   }
 
   //open modal to create a new pet
@@ -394,89 +572,9 @@ export default class App extends Component
   }
 
 
-  //create new pet
-  onCreatePet = (animal, name, breed, color) =>
-  {
-    this.showLoadingOverlay(true);
-
-    ApiPet.createPet(name, animal)
-    .then((newPetId) =>
-    {
-      let newPet = {
-        id: newPetId, //UUID.v4()
-        name,
-        attributes: { breed, color }
-      }
-
-      if (animal === PetTypes.Cat) {
-        this.setState({
-          catList: [...this.state.catList, newPet],
-          modal: {
-            active: "",
-            createPet: {//reset
-              animal: ""
-            }
-          }
-        })
-      }
-      else if (animal === PetTypes.Dog) {
-        this.setState({
-          dogList: [...this.state.dogList, newPet],
-          modal: {
-            active: "",
-            createPet: {//reset
-              animal: ""
-            }
-          }
-        })
-      }
   
-      this.createNotification("success", `New ${animal} with name '${name}' has been added to the ${animal}'s list`);
-      this.showLoadingOverlay(false);
-    })
-    .catch((error) =>
-    {
-      this.createNotification("error", error);
-      this.showLoadingOverlay(false);
-    });
-  }
 
-  //create new owner
-  onCreateOwner = (name, country, age) =>
-  {
-    this.showLoadingOverlay(true);
-
-    ApiOwner.createOwner(name)
-    .then((newOwnerId) =>
-    {
-      let newOwner = {
-        id: newOwnerId,
-        name,
-        attributes: {
-          country,
-          age
-        },
-        catIds: [],
-        dogIds: []
-      }
   
-      //update owners list and close modal
-      this.setState({
-        ownerList: [...this.state.ownerList, newOwner],
-        modal: {
-          active: ""
-        }
-      });
-
-      this.createNotification("success", `New owner '${name}' has been added to the owners list`);
-      this.showLoadingOverlay(false);
-    })
-    .catch((error) =>
-    {
-      this.createNotification("error", error);
-      this.showLoadingOverlay(false);
-    });
-  }
 
   render()
   {
@@ -525,7 +623,6 @@ export default class App extends Component
       });
     }
 
-
     return (
       <main>
         <div className={"modal" + (this.state.modal.active !== "" ? " open" : "")}>
@@ -533,7 +630,7 @@ export default class App extends Component
             <button className="modal-btn-close" onClick={this.onCloseModal}>Close Modal</button>
 
             {this.state.modal.active === "createPet" &&
-              <CreatePet animal={this.state.modal.createPet.animal} onCreatePet={this.onCreatePet} />
+              <CreatePet animal={this.state.modal.createPet.animal} onPetCreate={this.onPetCreate} />
             }
 
             {this.state.modal.active === "createOwner" &&
