@@ -14,9 +14,9 @@ export function formatCats(api_cats)
   {
     const { id, name } = api_cats; //{ id, name, owner }
     return {
-      id,
+      id: Number(id),
       name,
-      ownerId: api_cats.owner,
+      ownerId: Number(api_cats.owner),
       attributes: {
         breed: GenerateCatAttr.getBreed(),
         color: GenerateCatAttr.getColor(),
@@ -32,9 +32,9 @@ export function formatDogs(api_dogs)
   {
     const { id, name } = api_dog; //{ id, name, owner }
     return {
-      id,
+      id: Number(id),
       name,
-      ownerId: api_dog.owner,
+      ownerId: Number(api_dog.owner),
       attributes: {
         breed: GenerateDogAttr.getBreed(),
         color: GenerateDogAttr.getColor(),
@@ -245,11 +245,6 @@ export function renamePet(id, newName, animal, ownerId)
     })
     .catch(function (respError) //error from THEN block or page not found or owner not found
     {
-      if (respError.data !== undefined && respError.data.error !== undefined) { //pet not found
-        throw Error("Pet was not found in DB to be renamed");
-      }
-      else { //One of the errors above OR 404 page not found
         throw Error(errorMsg + respError.message);
-      }
     })
 }

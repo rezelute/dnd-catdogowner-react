@@ -75,11 +75,11 @@ export class OwnerApiUrl
 
   static getAllocatePet(id, petId)
   {
-    return this.getBase() + "/" + id + "/pet/" + petId;
+    return "http://localhost:3004/owner/" + id + "/pet/" + petId;
   }
 
   static getUnAllocatePet(id, petId)
   {
-    return this.getBase() + "/" + id + "/pet/" + petId;
+    return "http://localhost:3004/owner/" + id + "/pet/" + petId;
   }
 }

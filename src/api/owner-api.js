@@ -12,7 +12,7 @@ function formatOwners(api_owners)
     const { id, name } = api_owner; //, pets 
 
     return {
-      id,
+      id: Number(id),
       name,
       attributes: {
         age: GenerateOwnerAttr.getAge(),
@@ -60,33 +60,21 @@ export function deleteOwner(id)
       }
     }
   )
-  // .catch(function (respError) //404 - could be page not found or owner not found
-  // {
-  //   //owner was not found in the DB to be deleted, just delete from the state list
-  //   if (respError.data !== undefined && respError.data.error !== undefined) {
-  //     console.log("Owner was not found in DB, delete anyway");
-  //     return {
-  //       status: 200
-  //     }
-  //   }
-  // })
     .then(function (resp)
     {
       if (resp.status === 201 || resp.status === 200) { //success, response is null
         return id;
       }
-      else {
-        let error_info = "Server error"; //default error
-        if (resp.status === 403) { //unauth
-          error_info = resp.error;
-        }
-
-        throw Error(error_info);
-      }
     })
     .catch(function (error) //THEN block error || 404 page not found error || owner not found
     {
-      throw Error(errorMsg + error.message);
+      let error_info = "Server error"; //default error
+
+      if (error.response.status === 403) { //unauth
+        error_info = error.response.data.error;
+      }
+
+      throw Error(errorMsg + error_info);
     })
 }
 
@@ -128,26 +116,19 @@ export function renameOwner(id, newName, catIds, dogIds)
       if (resp.status === 201 || resp.status === 200) { //success, response is null
         return newName;
       }
-      else {
-        let error_info = "Server error"; //default error (such as 404)
-        if (resp.status === 400 || resp.status === 409) {//400="Names must be alphanumeric", 409="Name exists"
-          error_info = resp.error;
-        }
-        else if (resp.status === 403) { //unauth
-          error_info = resp.error;
-        }
-
-        throw Error(error_info);
-      }
     })
-    .catch(function (respError) //error from THEN block or page not found or owner not found
+    .catch(function (error) //error from THEN block or page not found or owner not found
     {
-      if (respError.data !== undefined && respError.data.error !== undefined) { //owner not found
-        throw Error("Owner was not found in DB to be renamed");
+      let error_info = "Server error"; //default error (such as 404)
+
+      if (error.response.status === 400 || error.response.status === 409) {//400="Names must be alphanumeric", 409="Name exists"
+        error_info = error.response.data.error;
       }
-      else { //One of the errors above OR 404 page not found
-        throw Error(errorMsg + respError.message);
+      else if (error.response.status === 403) { //unauth
+        error_info = error.response.data.error;
       }
+
+      throw Error(errorMsg + error_info);
     })
 }
 
@@ -172,21 +153,22 @@ export function createOwner(name)
       if (resp.status === 201 || resp.status === 200) { //success
         return resp.data.id;
       }
-      else {
-        let error_info = "Server error"; //default error
-        if (resp.status === 400 || resp.status === 409) {//400="Names must be alphanumeric", 409="Name exists"
-          error_info = resp.error;
-        }
-        else if (resp.status === 403) { //unauth
-          error_info = resp.error;
-        }
-
-        throw Error(errorMsg + error_info);
-      }
     })
     .catch(function (error) //404 page not found or error above
     {
-      throw Error(errorMsg + error.message);
+      let error_info = "";
+
+      if (error.response.status === 400 || error.response.status === 409) {//400="Names must be alphanumeric", 409="Name exists"
+        error_info = error.response.data.error;
+      }
+      else if (error.response.status === 403) { //unauth
+        error_info = error.response.data.error;
+      }
+      else { //404 maybe
+        error_info = error.message;
+      }
+
+      throw Error(errorMsg + error_info);
     })
 }
 
@@ -208,22 +190,14 @@ export function allocatePet(petId, animal, ownerId)
       if (resp.status === 201 || resp.status === 200) { //success
         return resp.data.id;
       }
-      else {
-        let error_info = "Server error"; //default error
-        if (resp.status === 403) { //unauth
-          error_info = resp.error;
-        }
-
-        throw Error(errorMsg + error_info);
-      }
     })
-    .catch(function (errorResp)
+    .catch(function (error) //page not found || "Owner or Pet not found" || unauth
     {
-      if (errorResp.data !== undefined && errorResp.data.error !== undefined) { //"Owner or Pet not found"
-        throw Error(errorMsg + "Owner or pet not found in the database");
+      if (error.response.status === 403) { //unauth
+        throw Error(errorMsg + error.response.data.error);
       }
-      else { //Error from THEN block OR 404 page not found
-        throw Error(errorMsg + errorResp.message);
+      else {
+        throw Error(errorMsg + error.message);
       }
     })
 }
