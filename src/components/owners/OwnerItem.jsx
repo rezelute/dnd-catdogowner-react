@@ -36,7 +36,6 @@ export default class OwnerItem extends Component
       isDragOver: false
     });
 
-    console.log("ownerId ", ownerId);
     this.props.onDrop(ownerId);
   }
 

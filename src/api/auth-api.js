@@ -8,10 +8,8 @@ export let authToken = ""; //authentication token
 export function setAuthData()
 {
   return axios.post(UserApiUrl.getLogin(), {
-    params: {
-      username: "hamzah",
-      password: "husseini"
-    }
+    username: "hamzah",
+    password: "husseini"
   })
     .then((resp) =>
     {

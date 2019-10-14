@@ -18,8 +18,8 @@ function formatOwners(api_owners)
         age: GenerateOwnerAttr.getAge(),
         country: GenerateOwnerAttr.getCountry(),
       },
-      catIds: [], //allocated later
-      dogIds: [] //allocated later
+      catIds: [], //allocated later in page-api
+      dogIds: [] //allocated later in page-api
     };
   });
 }
@@ -178,7 +178,9 @@ export function allocatePet(petId, animal, ownerId)
   let errorMsg = `Failed to allocate pet to owner, error is: `;
 
   return axios.post(OwnerApiUrl.getAllocatePet(ownerId,petId),
-    null,
+    {
+      animal
+    },
     { //config
       headers: {
         "x-api-key": authToken
@@ -191,29 +193,29 @@ export function allocatePet(petId, animal, ownerId)
         return resp.data.id;
       }
     })
-    .catch(function (error) //page not found || "Owner or Pet not found" || unauth
+    .catch(function (err) //page not found || "Owner or Pet not found" || unauth
     {
-      if (error.response.status === 403) { //unauth
-        throw Error(errorMsg + error.response.data.error);
+      if (err.response.status === 403) { //unauth
+        throw Error(errorMsg + err.response.data.error);
       }
       else {
-        throw Error(errorMsg + error.message);
+        throw Error(errorMsg + err.message);
       }
     })
 }
 
 
-//UNallocate pet to owner
-export function unAllocatePet(petId, animal, ownerId)
+//Remove pet to owner
+export function removePet(petId, animal, ownerId)
 {
-  let errorMsg = `Failed to un-allocate pet to owner, error is: `;
+  let errorMsg = `Failed to remove pet from owner, error is: `;
 
-  return axios.delete(OwnerApiUrl.getUnallocatePet(ownerId,petId),
-    null,
+  return axios.delete(OwnerApiUrl.getRemovePet(ownerId,petId),
     { //config
       headers: {
         "x-api-key": authToken
-      }
+      },
+      data: { animal }
     }
   )
     .then(function (resp)
@@ -221,22 +223,14 @@ export function unAllocatePet(petId, animal, ownerId)
       if (resp.status === 201 || resp.status === 200) { //success
         return resp.data.id;
       }
-      else {
-        let error_info = "Server error"; //default error
-        if (resp.status === 403) { //unauth
-          error_info = resp.error;
-        }
-
-        throw Error(errorMsg + error_info);
-      }
     })
-    .catch(function (errorResp)
+    .catch(function (err)
     {
-      if (errorResp.data !== undefined && errorResp.data.error !== undefined) { //"Owner or Pet not found"
-        throw Error(errorMsg + errorResp.data.error.message);
+      if (err.response.status === 403) { //unauth
+        throw Error(errorMsg + err.response.data.error);
       }
-      else {//error from THEN block or 404 page not found
-        throw Error(errorMsg + errorResp.message);
+      else { //404 page/pet/owner not found
+        throw Error(errorMsg + err.message);
       }
     })
 }

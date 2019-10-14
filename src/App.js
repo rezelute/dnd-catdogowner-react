@@ -24,17 +24,17 @@ export default class App extends Component
 {
   state = {
     showLoadingOverlay: false, //overlay when stuff is loading
-    catList: [], //{ id: 0, name: "", ownerId: 1, attributes: { breed: "", color: "" } },
-    dogList: [], //{ id: 0, name: "", ownerId: 1, attributes: { breed: "", color: "" } },
+    catList: [], //{ id: 0, name: "", ownerId: null, attributes: { breed: "", color: "" } },
+    dogList: [], //{ id: 0, name: "", ownerId: null, attributes: { breed: "", color: "" } },
     ownerList: [], //{ id: 0, name: "", attributes: {age: -1, country: ""} , catIds: [], dogIds: [] },
     draggedItem: {
-      petId: "-1",
+      petId: null,
       animal: ""
     },
     modal: {
       active: "", //ownerPets | createOwner | createPet | ""
       ownerPets: { //modal options
-        ownerId: "-1"
+        ownerId: null
       },
       createPet: { //modal options
         animal: ""
@@ -140,8 +140,7 @@ export default class App extends Component
     //another method
     //var data = event.dataTransfer.getData("text"); //console.log("Data id is: ", data);
     const { petId, animal } = JSON.parse(JSON.stringify(this.state.draggedItem));
-    console.log("Pet dropped - ID: ", petId, " Animal: ", animal);
-    console.log("Dropped on owner ID: ", ownerId);
+    console.log("Pet dropped - ID: ", petId, " Animal: ", animal, " dropped on owner id: ", ownerId);
 
     this.showLoadingOverlay(true);
 
@@ -431,10 +430,33 @@ export default class App extends Component
       {
         const delOwnerName = owner.name;
 
-        //update state
+        //update owner state
         this.setState({
           ownerList: this.state.ownerList.filter(owner => owner.id !== delOwnerId)
         });
+
+        //update catList/dogList to remove ownerId
+        let updCatList = [...this.state.catList];
+        updCatList.forEach(cat =>
+        {
+          if (cat.ownerId === delOwnerId) {
+            cat.ownerId = null;
+          }
+        });
+        let updDogList = [...this.state.dogList];
+        updDogList.forEach(dog =>
+        {
+          if (dog.ownerId === delOwnerId) {
+            dog.ownerId = null;
+          }
+        });
+
+        //update pet states
+        this.setState({
+          catList: updCatList,
+          dogList: updDogList
+        });
+
   
         this.createNotification("success", `Owner '${delOwnerName}' (id: ${deletedId}) has been deleted`);
         this.showLoadingOverlay(false);
@@ -526,24 +548,64 @@ export default class App extends Component
   {
     console.log("Remove pet ID: ", petId, ", animal: ", animal, " - from owner id: ", ownerId);
 
+    this.showLoadingOverlay(true);
+
+    //find owner item to be updated
     let updOwnerList = [...this.state.ownerList];
     let updOwner = updOwnerList.find(owner => owner.id === ownerId);
-    if (updOwner === undefined) {
-      this.createNotification("error", `Could not find owner to remove pet from, owner ID: ${ownerId}`);
-      return;
-    }
 
+    //find pet item to be updated
+    let updPetList;
+    let updPet;
     if (animal === PetTypes.Cat) {
-      updOwner.catIds = updOwner.catIds.filter(catId => catId !== petId);
+      updPetList = [...this.state.catList];
+      updPet = updPetList.find(cat => cat.id === petId);
     }
     else if (animal === PetTypes.Dog) {
-      updOwner.dogIds = updOwner.dogIds.filter(dogId => dogId !== petId);
+      updPetList = [...this.state.dogList];
+      updPet = updPetList.find(dog => dog.id === petId);
     }
 
-    //update owner state
-    this.setState({
-      ownerList: updOwnerList
-    });
+
+    if (updOwner !== undefined && updPet !== undefined) {
+      ApiOwner.removePet(petId, animal, ownerId)
+      .then((resp_petId, resp_ownerId) =>
+      {
+        //assign petid to the owner cat/dog ids list
+        if (animal === PetTypes.Cat) {
+          updOwner.catIds = updOwner.catIds.filter(catId => catId !== petId);
+        }
+        else if (animal === PetTypes.Dog) {
+          updOwner.dogIds = updOwner.dogIds.filter(dogId => dogId !== petId);
+        }
+        //update owner state
+        this.setState({
+          ownerList: updOwnerList
+        });
+
+        //un-assign ownerid from pet list
+        updPet.ownerId = null;
+        if (animal === PetTypes.Cat) {
+          this.setState({
+            catList: updPetList
+          });
+        }
+        else if (animal === PetTypes.Dog) {
+          this.setState({
+            dogList: updPetList
+          });
+        }
+
+        this.createNotification("success", `Pet '${updPet.name}' has been removed from '${updOwner.name}'`);
+        this.showLoadingOverlay(false);
+      })
+      .catch((error) =>
+      {
+        this.createNotification("error", error.message);
+        this.showLoadingOverlay(false);
+      });
+    }
+
 
     // //update showOwnerPets modal state
     // let updShowOwnerPets = JSON.parse(JSON.stringify(this.state.showOwnerPets));

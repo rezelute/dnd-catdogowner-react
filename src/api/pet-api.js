@@ -6,17 +6,17 @@ import { GenerateCatAttr, GenerateDogAttr } from "../js/data-generator";
 
 
 //convert the returned JSON data into app usable format
-//cat data: {"id": 1, "name": "Felix", "owner": -1}
-//cat app data: { id: 0, name: "", attributes: { breed: "", color: "" } },
+//cat data: {"id": 1, "name": "Felix", "owner": null}
+//cat app data: { id: 0, name: "", ownerId:null, attributes: { breed: "", color: "" } },
 export function formatCats(api_cats)
 {
   return api_cats.map(api_cats =>
   {
-    const { id, name } = api_cats; //{ id, name, owner }
+    const { id, name, owner } = api_cats; //{ id, name, owner }
     return {
       id: Number(id),
       name,
-      ownerId: Number(api_cats.owner),
+      ownerId: (owner!==null ? Number(owner) : null),
       attributes: {
         breed: GenerateCatAttr.getBreed(),
         color: GenerateCatAttr.getColor(),
@@ -24,17 +24,17 @@ export function formatCats(api_cats)
     }
   });
 }
-//dog data: {"id": 1, "name": "Felix", "owner": -1}
-//dog app data: { id: 0, name: "", attributes: { breed: "", color: "" } },
+//dog data: {"id": 1, "name": "Felix", "owner": null}
+//dog app data: { id: 0, name: "", ownerId:null, attributes: { breed: "", color: "" } },
 export function formatDogs(api_dogs)
 {
   return api_dogs.map(api_dog =>
   {
-    const { id, name } = api_dog; //{ id, name, owner }
+    const { id, name, owner } = api_dog; //{ id, name, owner }
     return {
       id: Number(id),
       name,
-      ownerId: Number(api_dog.owner),
+      ownerId: (owner!==null ? Number(owner) : null),
       attributes: {
         breed: GenerateDogAttr.getBreed(),
         color: GenerateDogAttr.getColor(),
@@ -116,7 +116,7 @@ export function createPet(name, animal)
   return axios.post(animalUrl,
     { //data
       name,
-      owner: -1 //testing (useless for LIVE)
+      owner: null
     },
     { //config
       headers: {
@@ -126,24 +126,25 @@ export function createPet(name, animal)
   )
     .then(function (resp)
     {
-      if (resp.status === 201) { //success
+      if (resp.status === 201 || resp.status === 200) { //success
         return resp.data.id;
       }
-      else { //error
-        let error_info = "Server error";
-        if (resp.status === 400 || resp.status === 409) {
-          error_info = resp.error;
-        }
-        else if (resp.status === 403) { //unauth
-          error_info = resp.error;
-        }
-
-        throw Error(error_info);
-      }
     })
-    .catch(function (respError) //error from THEN block or 404 page not found
+    .catch(function (err) //error from THEN block or 404 page not found
     {
-      throw Error(errorMsg + respError.message);
+      let error_info = "";
+
+      if (err.response.status === 400 || err.response.status === 409) {//400="Names must be alphanumeric", 409="Name exists"
+        error_info = err.response.data.error;
+      }
+      else if (err.response.status === 403) { //unauth
+        error_info = err.response.data.error;
+      }
+      else { //404 maybe
+        error_info = err.message;
+      }
+
+      throw Error(errorMsg + error_info);
     })
 }
 
@@ -161,7 +162,7 @@ export function deletePet(id, animal)
     petApiUrl = DogApiUrl.getDelete(id)
   }
 
-  return axios.delete( petApiUrl+"penis",
+  return axios.delete( petApiUrl,
     null,
     { //config
       headers: {
@@ -169,36 +170,21 @@ export function deletePet(id, animal)
       }
     }
   )
-    // .catch(function (respError) //404 - could be page not found or pet not found
-    // {
-    //   console.log("respError", respError.response.data);
-    //   if (respError !== undefined && respError.response !== undefined && respError.response.data.error !== undefined) { //pet was not found in the DB to be deleted, just delete from the state list
-    //     console.log("Pet was not found in DB, delete anyway");
-    //     return {
-    //       status: 200
-    //     }
-    //   }
-    //   else { //404 page not found
-    //     throw Error(errorMsg + "Page not found");
-    //   }
-    // })
     .then(function (resp)
     {
       if (resp.status === 201 || resp.status === 200) { //success, response is null
         return id;
       }
-      else {
-        let error_info = "Server error"; //default error
-        if (resp.status === 403) { //unauth
-          error_info = resp.error;
-        }
-
-        throw Error(errorMsg + error_info);
-      }
     })
-    .catch(function (respError) //error from THEN block OR 404 page not found error OR pet not found
+    .catch(function (err) //error from THEN block OR 404 page not found error OR pet not found
     {
-      throw Error(errorMsg + respError.message);
+      let error_info = "Server error"; //default error
+
+      if (err.response.status === 403) { //unauth
+        error_info = err.response.data.error;
+      }
+
+      throw Error(errorMsg + error_info);
     })
 }
 
@@ -218,7 +204,7 @@ export function renamePet(id, newName, animal, ownerId)
   return axios.put(petApiUrl,
     { //data
       name: newName,
-      owner: ownerId //testing for json-server (useless for LIVE)
+      owner: ownerId //ownerId on the pet itself
     },
     { //config
       headers: {
@@ -231,20 +217,18 @@ export function renamePet(id, newName, animal, ownerId)
       if (resp.status === 201 || resp.status === 200) { //success, response is null
         return newName;
       }
-      else {
-        let error_info = "Server error"; //default error (such as 404)
-        if (resp.status === 400 || resp.status === 409) {//400="Names must be alphanumeric", 409="Name exists"
-          error_info = resp.error;
-        }
-        else if (resp.status === 403) { //unauth
-          error_info = resp.error;
-        }
-
-        throw Error(error_info);
-      }
     })
-    .catch(function (respError) //error from THEN block or page not found or owner not found
+    .catch(function (err) //error from THEN block or page not found or owner not found
     {
-        throw Error(errorMsg + respError.message);
+      let error_info = "Server error"; //default error (such as 404)
+
+      if (err.response.status === 400 || err.response.status === 409) {//400="Names must be alphanumeric", 409="Name exists"
+        error_info = err.response.data.error;
+      }
+      else if (err.response.status === 403) { //unauth
+        error_info = err.response.data.error;
+      }
+
+      throw Error(errorMsg + error_info);
     })
 }

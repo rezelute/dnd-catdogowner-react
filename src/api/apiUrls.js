@@ -1,85 +1,116 @@
-
-export class UserApiUrl
+class UserApiUrlClass
 {
-  static getLogin()
+  domain = "";
+  constructor(domain)
   {
-    return "http://localhost:3004/login";
+    this.domain = domain;
+  }
+  getLogin()
+  {
+    return this.domain + "/login";
   }
 }
 
-export class CatApiUrl
+class CatApiUrlClass
 {
-  static getBase()
+  domain = "";
+  constructor(domain)
   {
-    return "http://localhost:3004/cats";
+    this.domain = domain;
   }
 
-  static getCreate()
+  getBase()
+  {
+    return this.domain + "/cats";
+  }
+
+  getCreate()
   {
     return this.getBase();
   }
 
-  static getUpdate(id)
+  getUpdate(id)
   {
     return this.getBase() + "/" + id;
   }
 
-  static getDelete(id)
+  getDelete(id)
   {
     return this.getBase() + "/" + id;
   }
 }
 
-export class DogApiUrl
+class DogApiUrlClass
 {
-  static getBase() {
-    return "http://localhost:3004/dogs";
+  domain = "";
+  constructor(domain)
+  {
+    this.domain = domain;
   }
 
-  static getCreate()
+  getBase() {
+    return this.domain + "/dogs";
+  }
+
+  getCreate()
   {
     return this.getBase();
   }
 
-  static getUpdate(id)
+  getUpdate(id)
   {
     return this.getBase() + "/" + id;
   }
 
-  static getDelete(id)
+  getDelete(id)
   {
     return this.getBase() + "/" + id;
   }
 }
 
-export class OwnerApiUrl
+class OwnerApiUrlClass
 {
-  static getBase() {
-    return "http://localhost:3004/owners";
+  domain = "";
+  constructor(domain)
+  {
+    this.domain = domain;
   }
 
-  static getCreate()
+  getBase() {
+    return this.domain + "/owners";
+  }
+
+  getCreate()
   {
     return this.getBase();
   }
   
-  static getUpdate(id)
+  getUpdate(id)
   {
     return this.getBase() + "/" + id;
   }
 
-  static getDelete(id)
+  getDelete(id)
   {
     return this.getBase() + "/" + id;
   }
 
-  static getAllocatePet(id, petId)
+  getAllocatePet(id, petId)
   {
-    return "http://localhost:3004/owner/" + id + "/pet/" + petId;
+    return this.domain + "/owner/" + id + "/pet/" + petId;
   }
 
-  static getUnAllocatePet(id, petId)
+  getRemovePet(id, petId)
   {
-    return "http://localhost:3004/owner/" + id + "/pet/" + petId;
+    return this.domain + "/owner/" + id + "/pet/" + petId;
   }
 }
+
+
+const domain = "http://localhost:3004";
+let UserApiUrl = new UserApiUrlClass(domain);
+let CatApiUrl = new CatApiUrlClass(domain);
+let DogApiUrl = new DogApiUrlClass(domain);
+let OwnerApiUrl = new OwnerApiUrlClass(domain);
+
+export { UserApiUrl, CatApiUrl, DogApiUrl, OwnerApiUrl };
