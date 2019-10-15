@@ -259,6 +259,7 @@ export default class App extends Component
     //find pet item to be updated
     let updPetList;
     let updPet;
+    let petOwnerId;
     if (animal === PetTypes.Cat) {
       updPetList = [...this.state.catList];
       updPet = updPetList.find(cat => cat.id === petId);
@@ -268,8 +269,10 @@ export default class App extends Component
       updPet = updPetList.find(dog => dog.id === petId);
     }
 
+    petOwnerId = updPet.ownerId;
     if (updPet !== undefined) {
-      ApiPet.renamePet(petId, newName, animal, updPet.ownerId)
+
+      ApiPet.renamePet(petId, newName, animal, petOwnerId)
       .then((resp_newName) =>
       {
         let oldPetName = updPet.name;
@@ -294,37 +297,6 @@ export default class App extends Component
       {
         this.createNotification("error", error.message);
         this.showLoadingOverlay(false);
-      });
-    }
-
-    
-
-    if (animal === PetTypes.Cat) {
-      let updList = [...this.state.catList];
-      let updCat = updList.find(cat => cat.id === petId);
-      if (updCat === undefined) {
-        this.createNotification("error", `Could not find Cat to rename, Cat ID: ${petId}`);
-        return;
-      }
-      updCat.name = newName;
-
-      //update state
-      this.setState({
-        catList: updList
-      });
-    }
-    else if (animal === PetTypes.Dog) {
-      let updList = [...this.state.dogList];
-      let updDog = updList.find(dog => dog.id === petId);
-      if (updDog === undefined) {
-        this.createNotification("error", `Could not find Dog to rename, Dog ID: ${petId}`);
-        return;
-      }
-      updDog.name = newName;
-
-      //update state
-      this.setState({
-        dogList: updList
       });
     }
   }
@@ -481,7 +453,7 @@ export default class App extends Component
       ApiOwner.renameOwner(ownerId, newName, updOwner.catIds, updOwner.dogIds)
       .then((resp_newName) =>
       {
-        let oldOwnerName = updOwner.name;
+        let oldOwnerName = Object.assign({}, updOwner.name);
         updOwner.name = resp_newName; //update new name for state
 
         //update state
@@ -638,6 +610,7 @@ export default class App extends Component
 
   render()
   {
+    console.log("runnig again");
     //get unassigned cats and dogs to render in sidebar
     let unassignedCatList = this.state.catList.filter((cat) =>
     {

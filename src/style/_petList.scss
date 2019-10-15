@@ -76,8 +76,9 @@ ul.pet-list > li > div{
   //functional buttons absolutely positioned
   .pet-buttons{
     position: absolute;
-    top: -2.2em;
-    right: 0;
+    top: 0.2em;
+    left: 50%;
+    transform: translate(-50%);
 
     button{
       font-size: 100%;
@@ -109,7 +110,7 @@ ul.pet-list > li > div{
     text-align: center;
     margin-bottom: 0.3em;
     margin-top:0;
-    padding: 0.5em;
+    padding: 1.8em 0.5em 0.5em 0.5em;
     color: white;
   }
 
