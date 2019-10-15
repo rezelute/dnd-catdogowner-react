@@ -610,7 +610,6 @@ export default class App extends Component
 
   render()
   {
-    console.log("runnig again");
     //get unassigned cats and dogs to render in sidebar
     let unassignedCatList = this.state.catList.filter((cat) =>
     {
