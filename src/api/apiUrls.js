@@ -108,7 +108,7 @@ class OwnerApiUrlClass
 
 //local = http://localhost:3004
 //live = https://cdo-json-server.rezelute.now.sh
-const domain = "https://cdo-json-server.rezelute.now.sh";//without ending forward slash - process.env.REACT_APP_API_URL;
+const domain = process.env.REACT_APP_API_URL;//without ending forward slash - process.env.REACT_APP_API_URL;
 
 
 let UserApiUrl = new UserApiUrlClass(domain);
