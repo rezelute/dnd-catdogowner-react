@@ -106,8 +106,11 @@ class OwnerApiUrlClass
   }
 }
 
+//local =http://localhost:3000
+//live = https://cdo-json-server.rezelute.now.sh
+const domain = "https://cdo-json-server.rezelute.now.sh";//without ending forward slash - process.env.REACT_APP_API_URL;
 
-const domain = "http://localhost:3004";
+
 let UserApiUrl = new UserApiUrlClass(domain);
 let CatApiUrl = new CatApiUrlClass(domain);
 let DogApiUrl = new DogApiUrlClass(domain);

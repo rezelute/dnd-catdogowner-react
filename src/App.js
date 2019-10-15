@@ -731,7 +731,7 @@ export default class App extends Component
         </section>
 
         <ToastContainer closeOnClick />
-        <LoadingOverlay active={this.state.showLoadingOverlay} spinner text='Loading ...'></LoadingOverlay>
+        <LoadingOverlay active={this.state.showLoadingOverlay} className="loadingOverlayCustom" spinner text='Loading ...'></LoadingOverlay>
       </main>
     );
   }
