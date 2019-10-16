@@ -1,3 +1,9 @@
+This app has been tested with Firefox, Edge, Chrome. IE is not supported.
+
+The app has scalable (rather than responsive) styling as it would probably not work well on mobile devices.
+
+## ###########################################
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
