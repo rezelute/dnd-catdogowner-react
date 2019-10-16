@@ -30,7 +30,6 @@ function allocatePetsToOwners(ownerList, api_cats, api_dogs)
 //get initial page data
 export function getPageData()
 {
-  console.log("get page data");
   return Promise.all([
     ApiGetCats(false),
     ApiGetDogs(false),

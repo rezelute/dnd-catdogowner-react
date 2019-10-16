@@ -10,7 +10,7 @@ ul.pet-list.sidebar{
     margin-bottom: 2.5em;
 
     //show drag hand on draggable area
-    .pet-draggable{
+    &.pet-draggable{
       cursor: grab;
     }
   }
@@ -65,13 +65,13 @@ ul.pet-list > li > div{
   //padding-bottom: 1em; //cater for absolute positioned id
   
   //show buttons on hover
-  &:hover{
-    .pet-buttons{
-      visibility:visible;
-      opacity:1;
-      transition:visibility 0.2s linear, opacity 0.2s linear;
-    }
-  }
+  // &hover{
+  //   .pet-buttons{
+  //     visibility:visible;
+  //     opacity:1;
+  //     transition:visibility 0.2s linear, opacity 0.2s linear;
+  //   }
+  // }
 
   //functional buttons absolutely positioned
   .pet-buttons{
@@ -148,6 +148,14 @@ ul.pet-list > li > div{
   }
 }
 
+//hover over each li shows the pet buttons
+ul.pet-list.sidebar > li.isHover{
+  .pet-buttons{
+    visibility:visible;
+    opacity:1;
+    transition:visibility 0.2s linear, opacity 0.2s linear;
+  }
+}
 
 
 
