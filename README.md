@@ -1,74 +1,41 @@
+## The project
+
+"Cats, Dogs and their Owners".
+
+In the same folder as this one you will find an service specification for a CatsDogsOwners(CDO) API.
+
+For this technical test you need to design a single page application that will consume this CDO API, and allow users of the page to:
+
+    Create, list, rename and delete; Cats, Dogs and Owners.
+
+    Allocate pets to, and remove Pets from, an Owner.
+
+Requirements that we would like you to work in to your solution...
+
+It is important that page users are able to perform their pet based administration tasks very quickly.
+After surveying a small user group we have determined that the following features are highly desirable to CDO users:
+
+    A single page where all Cats, Dogs and Owners are visible at the same time.
+
+    A 'card' based system, in which each Cat, Dog or Owner is represented by a card that can be dragged and dropped.
+
+    Dragging a Cat or Dog card onto an Owner card should allocate that Pet to that Owner.
+
+    All cards should present an intuitive way to rename or delete the card.
+
+    It is desirable that removing a Pet from an Owner should be as equally fast to perform as adding them.
+
+    It is desirable for the cards to be colour coded.
+
+    It is desirable for the cards to be drag-and-droppable anywhere on the page.
+
+
+## ###########################################
+## Notes
 This app has been tested with Firefox, Edge, Chrome. IE is not supported.
 
 The app has scalable (rather than responsive) styling as it would probably not work well on mobile devices.
 
+
 ## ###########################################
-
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
-
-## Available Scripts
-
-In the project directory, you can run:
-
-### `npm start`
-
-Runs the app in the development mode.<br />
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
-
-The page will reload if you make edits.<br />
-You will also see any lint errors in the console.
-
-### `npm test`
-
-Launches the test runner in the interactive watch mode.<br />
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `npm run build`
-
-Builds the app for production to the `build` folder.<br />
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.<br />
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (Webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/code-splitting
-
-### Analyzing the Bundle Size
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size
-
-### Making a Progressive Web App
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app
-
-### Advanced Configuration
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/advanced-configuration
-
-### Deployment
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/deployment
-
-### `npm run build` fails to minify
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
