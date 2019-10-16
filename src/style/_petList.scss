@@ -149,7 +149,7 @@ ul.pet-list > li > div{
 }
 
 //hover over each li shows the pet buttons
-ul.pet-list.sidebar > li.isHover{
+ul.pet-list > li.isHover{
   .pet-buttons{
     visibility:visible;
     opacity:1;

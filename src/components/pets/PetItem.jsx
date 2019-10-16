@@ -24,7 +24,7 @@ export default class PetItem extends Component
 
     //console.log("Dragging started. id: ", itemId, ItemId2, "- react event is:", event);
     //firefox fix to drag
-    event.dataTransfer.setData("text", event.target.getid);
+    event.dataTransfer.setData("text/html", event.target.outerHTML);
   }
 
   promptNewPetName = (petId, oldPetName) =>
