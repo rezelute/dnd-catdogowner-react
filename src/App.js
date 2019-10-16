@@ -190,7 +190,7 @@ export default class App extends Component
           });
         }
 
-        this.createNotification("success", `Owner ${updOwner.name} has been allocated ${animal} '${updPet.name}'`);
+        this.createNotification("success", `Owner '${updOwner.name}' has been allocated ${animal} '${updPet.name}'`);
         this.showLoadingOverlay(false);
       })
       .catch((error) =>

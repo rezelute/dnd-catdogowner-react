@@ -28,8 +28,8 @@ export default class OwnerItem extends Component
   }
 
   //ondrop of item in the box > prevent default (default is redirect) then pass up to parent
-  onDrop = (ownerId) => {
-    //event.preventDefault();
+  onDrop = (ownerId, event) => {
+    event.preventDefault();
 
     //remove highlight
     this.setState({
